@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState, type SyntheticEvent } from "react";
 
 import lightLogo from "@/app/assets/logo-light.svg";
 import darkLogo from "@/app/assets/logo-dark.svg";
@@ -11,7 +13,29 @@ import boardIcon from "@/app/assets/icon-board.svg";
 import hideSidebar from "@/app/assets/icon-hide-sidebar.svg";
 import showSidebar from "@/app/assets/icon-show-sidebar.svg";
 
-const boards = ["Platform Launch", "Marketing Plan", "Roadmap"];
+type Board = {
+  name: string;
+  href: string;
+  columns: string[];
+};
+
+const initialBoards: Board[] = [
+  {
+    name: "Platform Launch",
+    href: "/",
+    columns: ["Todo", "Doing", "Done"],
+  },
+  {
+    name: "Marketing Plan",
+    href: "/marketing-plan",
+    columns: [],
+  },
+  {
+    name: "Roadmap",
+    href: "/roadmap",
+    columns: [],
+  },
+];
 
 type SidebarProps = {
   isSidebarHidden: boolean;
@@ -22,13 +46,36 @@ export default function Sidebar({
   isSidebarHidden,
   setIsSidebarHidden,
 }: SidebarProps) {
-  const [selectedBoard, setSelectedBoard] = useState("Platform Launch");
+  const pathname = usePathname();
+
+  const [boards, setBoards] = useState<Board[]>(initialBoards);
+  const [isBoardsReady, setIsBoardsReady] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isThemeReady, setIsThemeReady] = useState(false);
+  const [isCreateBoardOpen, setIsCreateBoardOpen] = useState(false);
+  const [boardName, setBoardName] = useState("");
+  const [columns, setColumns] = useState(["Todo"]);
+
+  useEffect(() => {
+    const savedBoards = window.localStorage.getItem("boards");
+
+    if (savedBoards) {
+      setBoards(JSON.parse(savedBoards));
+    }
+
+    setIsBoardsReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isBoardsReady) return;
+
+    window.localStorage.setItem("boards", JSON.stringify(boards));
+  }, [boards, isBoardsReady]);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("theme");
     const shouldUseDarkTheme = savedTheme === "dark";
+
     setIsDark(shouldUseDarkTheme);
     setIsThemeReady(true);
   }, []);
@@ -40,6 +87,36 @@ export default function Sidebar({
     document.documentElement.style.colorScheme = isDark ? "dark" : "light";
     window.localStorage.setItem("theme", isDark ? "dark" : "light");
   }, [isDark, isThemeReady]);
+
+  function closeCreateBoardModal() {
+    setIsCreateBoardOpen(false);
+    setBoardName("");
+    setColumns(["Todo", "Doing"]);
+  }
+
+  function handleCreateBoard(event: SyntheticEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const name = boardName.trim();
+
+    if (!name) return;
+
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
+    setBoards((currentBoards) => [
+      ...currentBoards,
+      {
+        name,
+        href: `/boards/${slug}`,
+        columns: columns.map((column) => column.trim()).filter(Boolean),
+      },
+    ]);
+
+    closeCreateBoardModal();
+  }
 
   return (
     <>
@@ -65,13 +142,12 @@ export default function Sidebar({
 
           <ul className="mt-5 space-y-1 pr-6">
             {boards.map((board) => {
-              const isSelected = board === selectedBoard;
+              const isSelected = pathname === board.href;
 
               return (
-                <li key={board}>
-                  <button
-                    type="button"
-                    onClick={() => setSelectedBoard(board)}
+                <li key={board.href}>
+                  <Link
+                    href={board.href}
                     aria-current={isSelected ? "page" : undefined}
                     className={`flex h-12 w-full items-center gap-3 rounded-r-full px-8 text-sm font-bold transition-colors ${
                       isSelected
@@ -80,8 +156,8 @@ export default function Sidebar({
                     }`}
                   >
                     <Image src={boardIcon} width={16} height={16} alt="" />
-                    {board}
-                  </button>
+                    {board.name}
+                  </Link>
                 </li>
               );
             })}
@@ -89,6 +165,7 @@ export default function Sidebar({
 
           <button
             type="button"
+            onClick={() => setIsCreateBoardOpen(true)}
             className="mt-1 flex h-12 w-[calc(100%-24px)] items-center gap-3 rounded-r-full px-8 text-sm font-bold text-[#635fc7] transition-colors hover:bg-[#f4f7fd] dark:hover:bg-white"
           >
             <span className="text-xl leading-none" aria-hidden="true">
@@ -140,6 +217,93 @@ export default function Sidebar({
         >
           <Image src={showSidebar} width={16} height={11} alt="" />
         </button>
+      )}
+
+      {isCreateBoardOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <form
+            onSubmit={handleCreateBoard}
+            className="w-full max-w-[480px] rounded-md bg-white p-6 dark:bg-[#2b2c37]"
+          >
+            <h2 className="text-lg font-bold text-[#000112] dark:text-white">
+              Add New Board
+            </h2>
+
+            <label className="mt-6 block text-xs font-bold text-[#828fa3]">
+              Name
+              <input
+                type="text"
+                value={boardName}
+                onChange={(event) => setBoardName(event.target.value)}
+                placeholder="e.g. Web Design"
+                className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/50 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+              />
+            </label>
+
+            <p className="mt-6 text-xs font-bold text-[#828fa3]">Columns</p>
+
+            <div className="mt-2 space-y-3">
+              {columns.map((column, index) => (
+                <div key={`${column}-${index}`} className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={column}
+                    onChange={(event) => {
+                      setColumns((currentColumns) =>
+                        currentColumns.map((item, itemIndex) =>
+                          itemIndex === index ? event.target.value : item,
+                        ),
+                      );
+                    }}
+                    className="h-10 flex-1 rounded border border-[#828fa3]/25 px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                  />
+
+                  <button
+                    type="button"
+                    aria-label={`Remove ${column || "column"}`}
+                    onClick={() => {
+                      setColumns((currentColumns) =>
+                        currentColumns.filter(
+                          (_, itemIndex) => itemIndex !== index,
+                        ),
+                      );
+                    }}
+                    className="text-2xl leading-none text-[#828fa3] transition-colors hover:text-[#ea5555]"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() =>
+                setColumns((currentColumns) => [...currentColumns, ""])
+              }
+              className="mt-3 h-10 w-full rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20"
+            >
+              + Add New Column
+            </button>
+
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={closeCreateBoardModal}
+                className="h-10 flex-1 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="submit"
+                className="h-10 flex-1 rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
+              >
+                Create New Board
+              </button>
+            </div>
+          </form>
+        </div>
       )}
     </>
   );
