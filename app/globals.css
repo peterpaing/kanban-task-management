@@ -1,3 +1,6 @@
 @import "tailwindcss";
 
-
+@theme {
+  --color-button-purple: #A8A4FF;
+  --color-background-color: #F4F7FD;
+}
