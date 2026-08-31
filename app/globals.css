@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --color-button-purple: #A8A4FF;
+  --color-button-purple: #635FC7;
   --color-background-color: #F4F7FD;
 }
+
+@custom-variant dark (&:where(.dark, .dark *));

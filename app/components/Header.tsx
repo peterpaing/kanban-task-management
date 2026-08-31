@@ -1,15 +1,40 @@
 import Image from "next/image";
 
 import mobileLogo from "@/app/assets/logo-mobile.svg";
+import lightLogo from "@/app/assets/logo-light.svg";
+import darkLogo from "@/app/assets/logo-dark.svg";
 import dropDown from "@/app/assets/icon-chevron-down.svg";
 import addTaskIcon from "@/app/assets/icon-add-task-mobile.svg";
 import ellipsis from "@/app/assets/icon-vertical-ellipsis.svg";
 
-export default function Header() {
+type HeaderProps = {
+  showDesktopLogo: boolean;
+};
+
+export default function Header({ showDesktopLogo }: HeaderProps) {
   return (
-    <header className="flex w-full items-center justify-between bg-white p-4">
-      
+    <header className="flex w-full items-center justify-between bg-white p-4 text-[#000112] dark:bg-[#2b2c37] dark:text-white">
       <div className="flex items-center gap-3">
+        {showDesktopLogo && (
+          <div className="hidden shrink-0 md:flex">
+            <Image
+              src={darkLogo}
+              width={118}
+              height={20}
+              alt="Kanban"
+              className="dark:hidden mr-6"
+            />
+
+            <Image
+              src={lightLogo}
+              width={118}
+              height={20}
+              alt="Kanban"
+              className="hidden dark:block mr-6"
+            />
+          </div>
+        )}
+
         <Image
           src={mobileLogo}
           width={24}
@@ -18,18 +43,10 @@ export default function Header() {
           className="md:hidden"
         />
 
-        <h1 className="text-lg font-bold">Platform Launch</h1>
+        <h1 className="text-lg font-bold lg:text-xl">Platform Launch</h1>
 
-        <button
-          type="button"
-          aria-label="Open board selector"
-        >
-          <Image
-            src={dropDown}
-            width={10}
-            height={5}
-            alt=""
-          />
+        <button type="button" aria-label="Open board selector">
+          <Image src={dropDown} width={10} height={5} alt="" />
         </button>
       </div>
 
@@ -37,30 +54,19 @@ export default function Header() {
         <button
           type="button"
           aria-label="Add new task"
-          className="flex h-8 w-12 items-center justify-center gap-2 rounded-2xl bg-button-purple md:h-12 md:w-auto md:px-6"
+          className="flex h-8 w-12 items-center justify-center gap-2 rounded-full bg-[#a8a4ff] text-white transition-colors duration-300 ease-in-out hover:bg-[#635fc7] dark:bg-[#635fc7] dark:hover:bg-[#a8a4ff] md:w-auto md:px-4"
         >
-          <Image
-            src={addTaskIcon}
-            width={12}
-            height={12}
-            alt=""
-          />
+          <Image src={addTaskIcon} width={12} height={12} alt="" />
 
-          <span className="hidden md:inline">Add New Task</span>
+          <span className="hidden text-xs font-bold md:inline">
+            Add New Task
+          </span>
         </button>
 
-        <button
-          type="button"
-          aria-label="Open board menu"
-        >
-          <Image
-            src={ellipsis}
-            width={5}
-            height={16}
-            alt=""
-          />
+        <button type="button" aria-label="Open board menu">
+          <Image src={ellipsis} width={5} height={16} alt="" />
         </button>
       </div>
     </header>
-  )
+  );
 }
