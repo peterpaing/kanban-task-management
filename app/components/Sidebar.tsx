@@ -3,7 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type SyntheticEvent } from "react";
+import {
+  useState,
+  type Dispatch,
+  type SetStateAction,
+  type SyntheticEvent,
+} from "react";
+
+import { FiPlus } from "react-icons/fi";
 
 import lightLogo from "@/app/assets/logo-light.svg";
 import darkLogo from "@/app/assets/logo-dark.svg";
@@ -12,6 +19,7 @@ import darkThemeIcon from "@/app/assets/icon-dark-theme.svg";
 import boardIcon from "@/app/assets/icon-board.svg";
 import hideSidebar from "@/app/assets/icon-hide-sidebar.svg";
 import showSidebar from "@/app/assets/icon-show-sidebar.svg";
+import crossIcon from "@/app/assets/icon-cross.svg"
 
 type Board = {
   name: string;
@@ -19,74 +27,30 @@ type Board = {
   columns: string[];
 };
 
-const initialBoards: Board[] = [
-  {
-    name: "Platform Launch",
-    href: "/",
-    columns: ["Todo", "Doing", "Done"],
-  },
-  {
-    name: "Marketing Plan",
-    href: "/marketing-plan",
-    columns: [],
-  },
-  {
-    name: "Roadmap",
-    href: "/roadmap",
-    columns: [],
-  },
-];
-
 type SidebarProps = {
+  boards: Board[];
+  setBoards: Dispatch<SetStateAction<Board[]>>;
+  isDark: boolean;
+  setIsDark: Dispatch<SetStateAction<boolean>>;
+  isCreateBoardOpen: boolean;
+  setIsCreateBoardOpen: Dispatch<SetStateAction<boolean>>;
   isSidebarHidden: boolean;
   setIsSidebarHidden: (isHidden: boolean) => void;
 };
 
 export default function Sidebar({
+  boards,
+  setBoards,
+  isDark,
+  setIsDark,
+  isCreateBoardOpen,
+  setIsCreateBoardOpen,
   isSidebarHidden,
   setIsSidebarHidden,
 }: SidebarProps) {
   const pathname = usePathname();
-
-  const [boards, setBoards] = useState<Board[]>(initialBoards);
-  const [isBoardsReady, setIsBoardsReady] = useState(false);
-  const [isDark, setIsDark] = useState(false);
-  const [isThemeReady, setIsThemeReady] = useState(false);
-  const [isCreateBoardOpen, setIsCreateBoardOpen] = useState(false);
   const [boardName, setBoardName] = useState("");
   const [columns, setColumns] = useState(["Todo"]);
-
-  useEffect(() => {
-    const savedBoards = window.localStorage.getItem("boards");
-
-    if (savedBoards) {
-      setBoards(JSON.parse(savedBoards));
-    }
-
-    setIsBoardsReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isBoardsReady) return;
-
-    window.localStorage.setItem("boards", JSON.stringify(boards));
-  }, [boards, isBoardsReady]);
-
-  useEffect(() => {
-    const savedTheme = window.localStorage.getItem("theme");
-    const shouldUseDarkTheme = savedTheme === "dark";
-
-    setIsDark(shouldUseDarkTheme);
-    setIsThemeReady(true);
-  }, []);
-
-  useEffect(() => {
-    if (!isThemeReady) return;
-
-    document.documentElement.classList.toggle("dark", isDark);
-    document.documentElement.style.colorScheme = isDark ? "dark" : "light";
-    window.localStorage.setItem("theme", isDark ? "dark" : "light");
-  }, [isDark, isThemeReady]);
 
   function closeCreateBoardModal() {
     setIsCreateBoardOpen(false);
@@ -163,16 +127,14 @@ export default function Sidebar({
             })}
           </ul>
 
-          <button
+        <button
             type="button"
             onClick={() => setIsCreateBoardOpen(true)}
-            className="mt-1 flex h-12 w-[calc(100%-24px)] items-center gap-3 rounded-r-full px-8 text-sm font-bold text-[#635fc7] transition-colors hover:bg-[#f4f7fd] dark:hover:bg-white"
-          >
-            <span className="text-xl leading-none" aria-hidden="true">
-              +
-            </span>
-            Create New Board
-          </button>
+            className="mt-1 flex h-12 w-[calc(100%-24px)] items-center gap-3 rounded-r-full px-8 text-sm font-bold text-[#635fc7]"
+            >
+            <FiPlus size={18} className="shrink-0" aria-hidden="true" />
+            <span className="leading-none">Create New Board</span>
+        </button>
         </nav>
 
         <div className="mt-auto px-3 pb-8">
@@ -185,7 +147,7 @@ export default function Sidebar({
               aria-checked={isDark}
               aria-label="Toggle dark mode"
               onClick={() => setIsDark((currentTheme) => !currentTheme)}
-              className="flex h-5 w-10 items-center rounded-full bg-[#635fc7] p-0.5 transition-colors hover:bg-[#a8a4ff] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#635fc7]"
+              className="flex h-5 w-10 items-center rounded-full bg-[#635fc7] p-0.5 transition-colors hover:bg-[#a8a4ff]"
             >
               <span
                 className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
@@ -236,7 +198,7 @@ export default function Sidebar({
                 value={boardName}
                 onChange={(event) => setBoardName(event.target.value)}
                 placeholder="e.g. Web Design"
-                className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/50 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
               />
             </label>
 
@@ -248,42 +210,43 @@ export default function Sidebar({
                   <input
                     type="text"
                     value={column}
-                    onChange={(event) => {
+                    onChange={(event) =>
                       setColumns((currentColumns) =>
                         currentColumns.map((item, itemIndex) =>
                           itemIndex === index ? event.target.value : item,
                         ),
-                      );
-                    }}
+                      )
+                    }
                     className="h-10 flex-1 rounded border border-[#828fa3]/25 px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
                   />
 
                   <button
                     type="button"
                     aria-label={`Remove ${column || "column"}`}
-                    onClick={() => {
+                    onClick={() =>
                       setColumns((currentColumns) =>
                         currentColumns.filter(
                           (_, itemIndex) => itemIndex !== index,
                         ),
-                      );
-                    }}
-                    className="text-2xl leading-none text-[#828fa3] transition-colors hover:text-[#ea5555]"
+                      )
+                    }
+                    className="text-2xl leading-none text-[#828fa3] hover:text-[#ea5555]"
                   >
-                    ×
+                    <Image src={crossIcon} width={12} height={12} alt="" />
                   </button>
                 </div>
               ))}
             </div>
 
             <button
-              type="button"
-              onClick={() =>
+            type="button"
+            onClick={() =>
                 setColumns((currentColumns) => [...currentColumns, ""])
-              }
-              className="mt-3 h-10 w-full rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20"
+            }
+            className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
             >
-              + Add New Column
+            <FiPlus size={16} aria-hidden="true" />
+            <span>Add New Column</span>
             </button>
 
             <div className="mt-6 flex gap-3">
@@ -297,7 +260,7 @@ export default function Sidebar({
 
               <button
                 type="submit"
-                className="h-10 flex-1 rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
+                className="h-10 flex-1 rounded-full bg-[#635fc7] text-xs font-bold text-white hover:bg-[#a8a4ff]"
               >
                 Create New Board
               </button>

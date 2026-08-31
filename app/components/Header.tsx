@@ -4,14 +4,21 @@ import mobileLogo from "@/app/assets/logo-mobile.svg";
 import lightLogo from "@/app/assets/logo-light.svg";
 import darkLogo from "@/app/assets/logo-dark.svg";
 import dropDown from "@/app/assets/icon-chevron-down.svg";
+import dropUp from "@/app/assets/icon-chevron-up.svg";
 import addTaskIcon from "@/app/assets/icon-add-task-mobile.svg";
 import ellipsis from "@/app/assets/icon-vertical-ellipsis.svg";
 
 type HeaderProps = {
   showDesktopLogo: boolean;
+  isMobileMenuOpen: boolean;
+  onOpenMobileMenu: () => void;
 };
 
-export default function Header({ showDesktopLogo }: HeaderProps) {
+export default function Header({
+  showDesktopLogo,
+  isMobileMenuOpen,
+  onOpenMobileMenu,
+}: HeaderProps) {
   return (
     <header className="flex w-full items-center justify-between bg-white p-4 text-[#000112] dark:bg-[#2b2c37] dark:text-white">
       <div className="flex items-center gap-3">
@@ -22,7 +29,7 @@ export default function Header({ showDesktopLogo }: HeaderProps) {
               width={118}
               height={20}
               alt="Kanban"
-              className="dark:hidden mr-6"
+              className="mr-6 dark:hidden"
             />
 
             <Image
@@ -30,7 +37,7 @@ export default function Header({ showDesktopLogo }: HeaderProps) {
               width={118}
               height={20}
               alt="Kanban"
-              className="hidden dark:block mr-6"
+              className="mr-6 hidden dark:block"
             />
           </div>
         )}
@@ -45,8 +52,13 @@ export default function Header({ showDesktopLogo }: HeaderProps) {
 
         <h1 className="text-lg font-bold lg:text-xl">Platform Launch</h1>
 
-        <button type="button" aria-label="Open board selector">
-          <Image src={dropDown} width={10} height={5} alt="" />
+        <button
+          type="button"
+          aria-label="Open board selector"
+          onClick={onOpenMobileMenu}
+          className="md:hidden"
+        >
+        <Image src={isMobileMenuOpen ? dropUp : dropDown} width={10} height={5} alt="" />
         </button>
       </div>
 
