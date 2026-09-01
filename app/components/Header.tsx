@@ -1,5 +1,9 @@
-import Image from "next/image";
+"use client";
 
+import Image from "next/image";
+import { useState } from "react";
+
+import BoardMenu from "@/app/components/BoardMenu";
 import mobileLogo from "@/app/assets/logo-mobile.svg";
 import lightLogo from "@/app/assets/logo-light.svg";
 import darkLogo from "@/app/assets/logo-dark.svg";
@@ -12,13 +16,29 @@ type HeaderProps = {
   showDesktopLogo: boolean;
   isMobileMenuOpen: boolean;
   onOpenMobileMenu: () => void;
+  onEditBoard: () => void;
+  onDeleteBoard: () => void;
 };
 
 export default function Header({
   showDesktopLogo,
   isMobileMenuOpen,
   onOpenMobileMenu,
+  onEditBoard,
+  onDeleteBoard,
 }: HeaderProps) {
+  const [isBoardMenuOpen, setIsBoardMenuOpen] = useState(false);
+
+  function handleEditBoard() {
+    setIsBoardMenuOpen(false);
+    onEditBoard();
+  }
+
+  function handleDeleteBoard() {
+    setIsBoardMenuOpen(false);
+    onDeleteBoard();
+  }
+
   return (
     <header className="flex w-full items-center justify-between bg-white p-4 text-[#000112] dark:bg-[#2b2c37] dark:text-white">
       <div className="flex items-center gap-3">
@@ -58,7 +78,12 @@ export default function Header({
           onClick={onOpenMobileMenu}
           className="md:hidden"
         >
-        <Image src={isMobileMenuOpen ? dropUp : dropDown} width={10} height={5} alt="" />
+          <Image
+            src={isMobileMenuOpen ? dropUp : dropDown}
+            width={10}
+            height={5}
+            alt=""
+          />
         </button>
       </div>
 
@@ -75,9 +100,22 @@ export default function Header({
           </span>
         </button>
 
-        <button type="button" aria-label="Open board menu">
-          <Image src={ellipsis} width={5} height={16} alt="" />
-        </button>
+        <div className="relative">
+          <button
+            type="button"
+            aria-label="Open board menu"
+            aria-expanded={isBoardMenuOpen}
+            onClick={() => setIsBoardMenuOpen((isOpen) => !isOpen)}
+          >
+            <Image src={ellipsis} width={5} height={16} alt="" />
+          </button>
+
+          <BoardMenu
+            isOpen={isBoardMenuOpen}
+            onEditBoard={handleEditBoard}
+            onDeleteBoard={handleDeleteBoard}
+          />
+        </div>
       </div>
     </header>
   );

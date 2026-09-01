@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 
+import EditBoardModal from "@/app/components/EditBoardModal";
 import Header from "@/app/components/Header";
 import MobileBoardMenu from "@/app/components/MobileBoardMenu";
 import Sidebar from "@/app/components/Sidebar";
@@ -42,6 +43,7 @@ export default function AppShell({ children }: AppShellProps) {
   const [isDark, setIsDark] = useState(false);
   const [isThemeReady, setIsThemeReady] = useState(false);
   const [isCreateBoardOpen, setIsCreateBoardOpen] = useState(false);
+  const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
 
   useEffect(() => {
     const savedBoards = window.localStorage.getItem("boards");
@@ -90,8 +92,10 @@ export default function AppShell({ children }: AppShellProps) {
       <div className="flex min-w-0 flex-1 flex-col">
         <Header
           showDesktopLogo={isSidebarHidden}
-          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           isMobileMenuOpen={isMobileMenuOpen}
+          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+          onEditBoard={() => setIsEditBoardOpen(true)}
+          onDeleteBoard={() => console.log("Delete board later")}
         />
 
         <main className="flex-1">{children}</main>
@@ -104,6 +108,11 @@ export default function AppShell({ children }: AppShellProps) {
         onClose={() => setIsMobileMenuOpen(false)}
         onCreateBoard={() => setIsCreateBoardOpen(true)}
         onToggleTheme={() => setIsDark((currentTheme) => !currentTheme)}
+      />
+
+      <EditBoardModal
+        isOpen={isEditBoardOpen}
+        onClose={() => setIsEditBoardOpen(false)}
       />
     </div>
   );
