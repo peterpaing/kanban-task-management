@@ -16,6 +16,8 @@ type UpdatedBoard = {
   columns: string[];
 };
 
+const BOARDS_STORAGE_KEY = "kanban-boards-v2";
+
 const columnColors = ["#49C4E5", "#8471F2", "#67E2AE", "#E4EBFA"];
 
 export default function DynamicBoardPage() {
@@ -27,7 +29,7 @@ export default function DynamicBoardPage() {
 
   useEffect(() => {
     function loadBoard() {
-      const savedBoards = window.localStorage.getItem("boards");
+      const savedBoards = window.localStorage.getItem(BOARDS_STORAGE_KEY);
 
       if (savedBoards) {
         const boards: Board[] = JSON.parse(savedBoards);
@@ -49,7 +51,7 @@ export default function DynamicBoardPage() {
   }, [boardHref]);
 
   function handleSaveBoard(updatedBoard: UpdatedBoard) {
-    const savedBoards = window.localStorage.getItem("boards");
+    const savedBoards = window.localStorage.getItem(BOARDS_STORAGE_KEY);
 
     if (!savedBoards) return;
 
@@ -65,10 +67,15 @@ export default function DynamicBoardPage() {
         : item,
     );
 
-    window.localStorage.setItem("boards", JSON.stringify(updatedBoards));
+    window.localStorage.setItem(
+      BOARDS_STORAGE_KEY,
+      JSON.stringify(updatedBoards),
+    );
+
     setBoard(
       updatedBoards.find((item) => item.href === boardHref) ?? null,
     );
+
     window.dispatchEvent(new Event("boards-updated"));
   }
 
@@ -79,6 +86,7 @@ export default function DynamicBoardPage() {
   if (!board || board.columns.length === 0) {
     return (
       <EmptyBoardState
+        board={board}
         onAddColumn={() => {}}
         onSave={handleSaveBoard}
       />

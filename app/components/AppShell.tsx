@@ -175,6 +175,7 @@ export default function AppShell({ children }: AppShellProps) {
       />
 
       <EditBoardModal
+        board={currentBoard}
         isOpen={isEditBoardOpen}
         onClose={() => setIsEditBoardOpen(false)}
         onSave={handleSaveBoard}

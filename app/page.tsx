@@ -79,9 +79,10 @@ export default function HomePage() {
   if (!board || board.columns.length === 0) {
     return (
       <EmptyBoardState
-        onAddColumn={() => {}}
-        onSave={handleSaveBoard}
-      />
+      board={board}
+      onAddColumn={() => {}}
+      onSave={handleSaveBoard}
+    />
     );
   }
 

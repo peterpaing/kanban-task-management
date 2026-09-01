@@ -1,10 +1,15 @@
 "use client";
 
 import Image from "next/image";
-import { useState, type SyntheticEvent } from "react";
+import { useEffect, useState, type SyntheticEvent } from "react";
 import { FiPlus } from "react-icons/fi";
 
 import crossIcon from "@/app/assets/icon-cross.svg";
+
+type BoardData = {
+  name: string;
+  columns: string[];
+};
 
 type UpdatedBoard = {
   name: string;
@@ -12,18 +17,33 @@ type UpdatedBoard = {
 };
 
 type EditBoardModalProps = {
+  board?: BoardData | null;
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedBoard: UpdatedBoard) => void;
 };
 
 export default function EditBoardModal({
+  board,
   isOpen,
   onClose,
   onSave,
 }: EditBoardModalProps) {
-  const [boardName, setBoardName] = useState("Platform Launch");
-  const [columns, setColumns] = useState(["Todo", "Doing"]);
+  const [boardName, setBoardName] = useState("");
+  const [columns, setColumns] = useState<string[]>([]);
+  const [nameError, setNameError] = useState("");
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    setBoardName(board?.name ?? "Platform Launch");
+    setColumns(
+    board && board.columns.length > 0
+      ? board.columns
+      : ["Todo", "Doing"],
+  );
+    setNameError("");
+  }, [board, isOpen]);
 
   if (!isOpen) return null;
 
@@ -35,7 +55,10 @@ export default function EditBoardModal({
       .map((column) => column.trim())
       .filter(Boolean);
 
-    if (!name) return;
+    if (!name) {
+      setNameError("Board name cannot be empty.");
+      return;
+    }
 
     onSave({
       name,
@@ -61,13 +84,23 @@ export default function EditBoardModal({
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Name
+
           <input
             type="text"
             value={boardName}
-            onChange={(event) => setBoardName(event.target.value)}
+            onChange={(event) => {
+              setBoardName(event.target.value);
+              setNameError("");
+            }}
             className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
           />
         </label>
+
+        {nameError && (
+          <p className="mt-2 text-xs font-bold text-[#ea5555]">
+            {nameError}
+          </p>
+        )}
 
         <p className="mt-6 text-xs font-bold text-[#828fa3]">Columns</p>
 
