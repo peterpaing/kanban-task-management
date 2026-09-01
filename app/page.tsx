@@ -1,5 +1,13 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return 
+import EmptyBoardState from "@/app/components/EmptyBoardState";
+
+export default function HomePage() {
+  return (
+    <EmptyBoardState
+      onAddColumn={() => {
+        console.log("Open the Add New Column form later");
+      }}
+    />
+  );
 }

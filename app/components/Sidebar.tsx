@@ -19,7 +19,7 @@ import darkThemeIcon from "@/app/assets/icon-dark-theme.svg";
 import boardIcon from "@/app/assets/icon-board.svg";
 import hideSidebar from "@/app/assets/icon-hide-sidebar.svg";
 import showSidebar from "@/app/assets/icon-show-sidebar.svg";
-import crossIcon from "@/app/assets/icon-cross.svg"
+import crossIcon from "@/app/assets/icon-cross.svg";
 
 type Board = {
   name: string;
@@ -50,12 +50,12 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [boardName, setBoardName] = useState("");
-  const [columns, setColumns] = useState(["Todo"]);
+  const [columns, setColumns] = useState<string[]>([]);
 
   function closeCreateBoardModal() {
     setIsCreateBoardOpen(false);
     setBoardName("");
-    setColumns(["Todo", "Doing"]);
+    setColumns([]);
   }
 
   function handleCreateBoard(event: SyntheticEvent<HTMLFormElement>) {
@@ -74,7 +74,7 @@ export default function Sidebar({
       ...currentBoards,
       {
         name,
-        href: `/boards/${slug}`,
+        href: `/${slug}`,
         columns: columns.map((column) => column.trim()).filter(Boolean),
       },
     ]);
@@ -127,14 +127,14 @@ export default function Sidebar({
             })}
           </ul>
 
-        <button
+          <button
             type="button"
             onClick={() => setIsCreateBoardOpen(true)}
             className="mt-1 flex h-12 w-[calc(100%-24px)] items-center gap-3 rounded-r-full px-8 text-sm font-bold text-[#635fc7]"
-            >
+          >
             <FiPlus size={18} className="shrink-0" aria-hidden="true" />
             <span className="leading-none">Create New Board</span>
-        </button>
+          </button>
         </nav>
 
         <div className="mt-auto px-3 pb-8">
@@ -230,7 +230,7 @@ export default function Sidebar({
                         ),
                       )
                     }
-                    className="text-2xl leading-none text-[#828fa3] hover:text-[#ea5555]"
+                    className="flex h-10 w-6 items-center justify-center"
                   >
                     <Image src={crossIcon} width={12} height={12} alt="" />
                   </button>
@@ -239,14 +239,14 @@ export default function Sidebar({
             </div>
 
             <button
-            type="button"
-            onClick={() =>
+              type="button"
+              onClick={() =>
                 setColumns((currentColumns) => [...currentColumns, ""])
-            }
-            className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
+              }
+              className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
             >
-            <FiPlus size={16} aria-hidden="true" />
-            <span>Add New Column</span>
+              <FiPlus size={16} aria-hidden="true" />
+              <span>Add New Column</span>
             </button>
 
             <div className="mt-6 flex gap-3">
