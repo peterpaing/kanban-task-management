@@ -6,14 +6,21 @@ import { FiPlus } from "react-icons/fi";
 
 import crossIcon from "@/app/assets/icon-cross.svg";
 
+type UpdatedBoard = {
+  name: string;
+  columns: string[];
+};
+
 type EditBoardModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onSave: (updatedBoard: UpdatedBoard) => void;
 };
 
 export default function EditBoardModal({
   isOpen,
   onClose,
+  onSave,
 }: EditBoardModalProps) {
   const [boardName, setBoardName] = useState("Platform Launch");
   const [columns, setColumns] = useState(["Todo", "Doing"]);
@@ -23,9 +30,16 @@ export default function EditBoardModal({
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    console.log({
-      name: boardName,
-      columns: columns.map((column) => column.trim()).filter(Boolean),
+    const name = boardName.trim();
+    const cleanedColumns = columns
+      .map((column) => column.trim())
+      .filter(Boolean);
+
+    if (!name) return;
+
+    onSave({
+      name,
+      columns: cleanedColumns,
     });
 
     onClose();

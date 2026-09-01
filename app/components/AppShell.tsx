@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 import EditBoardModal from "@/app/components/EditBoardModal";
 import Header from "@/app/components/Header";
@@ -13,11 +14,13 @@ type Board = {
   columns: string[];
 };
 
+const BOARDS_STORAGE_KEY = "kanban-boards-v2";
+
 const initialBoards: Board[] = [
   {
     name: "Platform Launch",
     href: "/",
-    columns: ["Todo", "Doing", "Done"],
+    columns: [],
   },
   {
     name: "Marketing Plan",
@@ -36,6 +39,8 @@ type AppShellProps = {
 };
 
 export default function AppShell({ children }: AppShellProps) {
+  const pathname = usePathname();
+
   const [isSidebarHidden, setIsSidebarHidden] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [boards, setBoards] = useState<Board[]>(initialBoards);
@@ -46,7 +51,7 @@ export default function AppShell({ children }: AppShellProps) {
   const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
 
   useEffect(() => {
-    const savedBoards = window.localStorage.getItem("boards");
+    const savedBoards = window.localStorage.getItem(BOARDS_STORAGE_KEY);
 
     if (savedBoards) {
       setBoards(JSON.parse(savedBoards));
@@ -58,7 +63,11 @@ export default function AppShell({ children }: AppShellProps) {
   useEffect(() => {
     if (!isBoardsReady) return;
 
-    window.localStorage.setItem("boards", JSON.stringify(boards));
+    window.localStorage.setItem(
+      BOARDS_STORAGE_KEY,
+      JSON.stringify(boards),
+    );
+    window.dispatchEvent(new Event("boards-updated"));
   }, [boards, isBoardsReady]);
 
   useEffect(() => {
@@ -75,6 +84,23 @@ export default function AppShell({ children }: AppShellProps) {
     document.documentElement.style.colorScheme = isDark ? "dark" : "light";
     window.localStorage.setItem("theme", isDark ? "dark" : "light");
   }, [isDark, isThemeReady]);
+
+  function handleSaveBoard(updatedBoard: {
+    name: string;
+    columns: string[];
+  }) {
+    setBoards((currentBoards) =>
+      currentBoards.map((board) =>
+        board.href === pathname
+          ? {
+              ...board,
+              name: updatedBoard.name,
+              columns: updatedBoard.columns,
+            }
+          : board,
+      ),
+    );
+  }
 
   return (
     <div className="flex min-h-screen">
@@ -113,6 +139,7 @@ export default function AppShell({ children }: AppShellProps) {
       <EditBoardModal
         isOpen={isEditBoardOpen}
         onClose={() => setIsEditBoardOpen(false)}
+        onSave={handleSaveBoard}
       />
     </div>
   );

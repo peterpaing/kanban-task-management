@@ -5,12 +5,19 @@ import { FiPlus } from "react-icons/fi";
 
 import EditBoardModal from "@/app/components/EditBoardModal";
 
+type UpdatedBoard = {
+  name: string;
+  columns: string[];
+};
+
 type EmptyBoardStateProps = {
   onAddColumn: () => void;
+  onSave: (updatedBoard: UpdatedBoard) => void;
 };
 
 export default function EmptyBoardState({
   onAddColumn,
+  onSave,
 }: EmptyBoardStateProps) {
   const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
 
@@ -39,6 +46,7 @@ export default function EmptyBoardState({
       <EditBoardModal
         isOpen={isEditBoardOpen}
         onClose={() => setIsEditBoardOpen(false)}
+        onSave={onSave}
       />
     </>
   );
