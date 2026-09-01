@@ -13,6 +13,7 @@ import addTaskIcon from "@/app/assets/icon-add-task-mobile.svg";
 import ellipsis from "@/app/assets/icon-vertical-ellipsis.svg";
 
 type HeaderProps = {
+  boardName: string;
   showDesktopLogo: boolean;
   isMobileMenuOpen: boolean;
   onOpenMobileMenu: () => void;
@@ -21,6 +22,7 @@ type HeaderProps = {
 };
 
 export default function Header({
+  boardName,
   showDesktopLogo,
   isMobileMenuOpen,
   onOpenMobileMenu,
@@ -70,7 +72,7 @@ export default function Header({
           className="md:hidden"
         />
 
-        <h1 className="text-lg font-bold lg:text-xl">Platform Launch</h1>
+        <h1 className="text-lg font-bold lg:text-xl">{boardName}</h1>
 
         <button
           type="button"

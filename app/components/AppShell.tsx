@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
+import DeleteBoardModal from "@/app/components/DeleteBoardModal";
 import EditBoardModal from "@/app/components/EditBoardModal";
 import Header from "@/app/components/Header";
 import MobileBoardMenu from "@/app/components/MobileBoardMenu";
@@ -40,6 +41,7 @@ type AppShellProps = {
 
 export default function AppShell({ children }: AppShellProps) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [isSidebarHidden, setIsSidebarHidden] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -49,6 +51,10 @@ export default function AppShell({ children }: AppShellProps) {
   const [isThemeReady, setIsThemeReady] = useState(false);
   const [isCreateBoardOpen, setIsCreateBoardOpen] = useState(false);
   const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
+  const [isDeleteBoardOpen, setIsDeleteBoardOpen] = useState(false);
+
+  const currentBoard =
+    boards.find((board) => board.href === pathname) ?? null;
 
   useEffect(() => {
     const savedBoards = window.localStorage.getItem(BOARDS_STORAGE_KEY);
@@ -102,6 +108,33 @@ export default function AppShell({ children }: AppShellProps) {
     );
   }
 
+  function handleDeleteBoard() {
+    if (!currentBoard) return;
+
+    const remainingBoards = boards.filter(
+      (board) => board.href !== currentBoard.href,
+    );
+
+    let nextBoards = remainingBoards;
+    let nextPath = "/";
+
+    if (currentBoard.href === "/" && remainingBoards.length > 0) {
+      const [nextMainBoard, ...otherBoards] = remainingBoards;
+
+      nextBoards = [
+        {
+          ...nextMainBoard,
+          href: "/",
+        },
+        ...otherBoards,
+      ];
+    }
+
+    setBoards(nextBoards);
+    setIsDeleteBoardOpen(false);
+    router.replace(nextPath);
+  }
+
   return (
     <div className="flex min-h-screen">
       <Sidebar
@@ -117,11 +150,16 @@ export default function AppShell({ children }: AppShellProps) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Header
+          boardName={currentBoard?.name ?? "No Boards"}
           showDesktopLogo={isSidebarHidden}
           isMobileMenuOpen={isMobileMenuOpen}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onEditBoard={() => setIsEditBoardOpen(true)}
-          onDeleteBoard={() => console.log("Delete board later")}
+          onDeleteBoard={() => {
+            if (currentBoard) {
+              setIsDeleteBoardOpen(true);
+            }
+          }}
         />
 
         <main className="flex-1">{children}</main>
@@ -140,6 +178,13 @@ export default function AppShell({ children }: AppShellProps) {
         isOpen={isEditBoardOpen}
         onClose={() => setIsEditBoardOpen(false)}
         onSave={handleSaveBoard}
+      />
+
+      <DeleteBoardModal
+        isOpen={isDeleteBoardOpen}
+        boardName={currentBoard?.name ?? ""}
+        onClose={() => setIsDeleteBoardOpen(false)}
+        onDelete={handleDeleteBoard}
       />
     </div>
   );
