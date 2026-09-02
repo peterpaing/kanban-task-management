@@ -87,7 +87,7 @@ export default function ViewTaskModal({
           onClick={(event) => event.stopPropagation()}
           className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
         >
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center justify-between gap-3">
             <h2
               id="view-task-title"
               className="min-w-0 break-words text-lg font-bold text-[#000112] dark:text-white"
@@ -104,7 +104,7 @@ export default function ViewTaskModal({
                   onClick={() => setIsTaskMenuOpen((open) => !open)}
                   className="text-[#828fa3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
                 >
-                  <FiMoreVertical size={18} />
+                  <FiMoreVertical size={18} className="mt-1"/>
                 </button>
 
                 {isTaskMenuOpen && (

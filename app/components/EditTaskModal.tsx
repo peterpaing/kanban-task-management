@@ -36,7 +36,7 @@ export default function EditTaskModal({
   const [status, setStatus] = useState("");
   const [titleError, setTitleError] = useState("");
   const modalRef = useModalAccessibility<HTMLFormElement>(isOpen, onClose);
-
+/* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!isOpen || !task) return;
 
@@ -46,7 +46,7 @@ export default function EditTaskModal({
     setStatus(task.status);
     setTitleError("");
   }, [isOpen, task]);
-
+/* eslint-enable react-hooks/set-state-in-effect */
   if (!isOpen || !task) return null;
 
   const currentTask = task;
@@ -212,23 +212,23 @@ export default function EditTaskModal({
           </select>
         </label>
 
-        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={onClose}
-            className="h-10 flex-1 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
-          >
-            Cancel
-          </button>
+        <div className="mt-6 flex flex-col-reverse items-center gap-3 sm:flex-row">
+        <button
+          type="button"
+          onClick={onClose}
+          className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] sm:max-w-none sm:flex-1"
+        >
+          Cancel
+        </button>
 
-          <button
-            type="submit"
-            disabled={!hasChanges || !title.trim()}
-            className="h-10 flex-1 rounded-full bg-[#635fc7] text-xs font-bold text-white disabled:cursor-not-allowed disabled:bg-[#635fc7]/40"
-          >
-            Save Changes
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={!hasChanges || !title.trim()}
+          className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7] text-xs font-bold text-white disabled:cursor-not-allowed disabled:bg-[#635fc7]/40 sm:max-w-none sm:flex-1"
+        >
+          Save Changes
+        </button>
+      </div>
       </form>
     </div>
   );

@@ -9,15 +9,8 @@ import EditBoardModal from "@/app/components/EditBoardModal";
 import Header from "@/app/components/Header";
 import MobileBoardMenu from "@/app/components/MobileBoardMenu";
 import Sidebar from "@/app/components/Sidebar";
-import {
-  loadBoards,
-  saveBoards,
-} from "@/app/lib/boardsStorage";
-import type {
-  Board,
-  Task,
-  UpdatedBoard,
-} from "@/app/types/kanban";
+import { loadBoards, saveBoards } from "@/app/lib/boardsStorage";
+import type { Board, Task, UpdatedBoard } from "@/app/types/kanban";
 
 const initialBoards: Board[] = [
   {
@@ -62,10 +55,12 @@ export default function AppShell({ children }: AppShellProps) {
   const currentBoard =
     boards.find((board) => board.href === pathname) ?? null;
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     setBoards(loadBoards(initialBoards));
     setIsBoardsReady(true);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     function syncBoardsFromStorage() {
@@ -92,12 +87,14 @@ export default function AppShell({ children }: AppShellProps) {
     window.dispatchEvent(new Event("boards-updated"));
   }, [boards, isBoardsReady]);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("theme");
 
     setIsDark(savedTheme === "dark");
     setIsThemeReady(true);
   }, []);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   useEffect(() => {
     if (!isThemeReady) return;

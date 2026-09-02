@@ -38,7 +38,7 @@ export default function EditBoardModal({
   const [columnsError, setColumnsError] = useState("");
 
   const modalRef = useModalAccessibility<HTMLFormElement>(isOpen, onClose);
-
+/* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!isOpen) return;
 
@@ -49,7 +49,7 @@ export default function EditBoardModal({
     setNameError("");
     setColumnsError("");
   }, [board, isOpen]);
-
+/* eslint-enable react-hooks/set-state-in-effect */
   if (!isOpen) return null;
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {

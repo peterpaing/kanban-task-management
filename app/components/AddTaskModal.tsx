@@ -31,6 +31,7 @@ export default function AddTaskModal({
   const [titleError, setTitleError] = useState("");
   const modalRef = useModalAccessibility<HTMLFormElement>(isOpen, onClose);
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!isOpen) return;
 
@@ -40,6 +41,7 @@ export default function AddTaskModal({
     setStatus(columns[0]?.id ?? "");
     setTitleError("");
   }, [columns, isOpen]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (!isOpen) return null;
 

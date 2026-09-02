@@ -20,10 +20,7 @@ import lightLogo from "@/app/assets/logo-light.svg";
 import lightThemeIcon from "@/app/assets/icon-light-theme.svg";
 import showSidebar from "@/app/assets/icon-show-sidebar.svg";
 import useModalAccessibility from "@/app/hooks/useModalAccessibility";
-import {
-  createColumn,
-  createId,
-} from "@/app/lib/boardsStorage";
+import { createColumn } from "@/app/lib/boardsStorage";
 import type {
   Board,
   Column,
