@@ -214,10 +214,14 @@ export default function Sidebar({
       )}
 
       {isCreateBoardOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4 md:p-6"
+          onClick={closeCreateBoardModal}
+        >
           <form
             onSubmit={handleCreateBoard}
-            className="w-full max-w-[480px] rounded-md bg-white p-6 dark:bg-[#2b2c37]"
+            onClick={(event) => event.stopPropagation()}
+            className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
           >
             <h2 className="text-lg font-bold text-[#000112] dark:text-white">
               Add New Board
@@ -235,7 +239,7 @@ export default function Sidebar({
                 }}
                 placeholder="e.g. Web Design"
                 aria-invalid={Boolean(boardNameError)}
-                className={`mt-2 h-10 w-full rounded border px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white ${
+                className={`mt-2 h-10 w-full rounded border bg-white px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white ${
                   boardNameError
                     ? "border-[#ea5555]"
                     : "border-[#828fa3]/25"
@@ -264,7 +268,7 @@ export default function Sidebar({
                         ),
                       )
                     }
-                    className="h-10 flex-1 rounded border border-[#828fa3]/25 px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                    className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
                   />
 
                   <button
@@ -277,7 +281,7 @@ export default function Sidebar({
                         ),
                       )
                     }
-                    className="flex h-10 w-6 items-center justify-center"
+                    className="flex h-10 w-6 shrink-0 items-center justify-center"
                   >
                     <Image src={crossIcon} width={12} height={12} alt="" />
                   </button>
@@ -290,24 +294,24 @@ export default function Sidebar({
               onClick={() =>
                 setColumns((currentColumns) => [...currentColumns, ""])
               }
-              className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
+              className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20"
             >
               <FiPlus size={16} aria-hidden="true" />
               <span>Add New Column</span>
             </button>
 
-            <div className="mt-6 flex gap-3">
+            <div className="mt-6 flex flex-col-reverse items-center gap-3 sm:flex-row">
               <button
                 type="button"
                 onClick={closeCreateBoardModal}
-                className="h-10 flex-1 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
+                className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 sm:max-w-none sm:flex-1"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="h-10 flex-1 rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
+                className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff] sm:max-w-none sm:flex-1"
               >
                 Create New Board
               </button>

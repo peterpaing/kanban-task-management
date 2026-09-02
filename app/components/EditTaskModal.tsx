@@ -105,13 +105,13 @@ export default function EditTaskModal({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4 md:p-6"
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-3 sm:p-4 md:p-6"
       onClick={onClose}
     >
       <form
         onSubmit={handleSubmit}
         onClick={(event) => event.stopPropagation()}
-        className="max-h-[90vh] w-full max-w-[480px] overflow-y-auto rounded-md bg-white p-6 dark:bg-[#2b2c37] md:p-8"
+        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
       >
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-bold text-[#000112] dark:text-white">
@@ -158,7 +158,7 @@ export default function EditTaskModal({
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="e.g. It’s always good to take a break."
-            className="mt-2 min-h-28 w-full resize-none rounded border border-[#828fa3]/25 bg-white px-4 py-3 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+            className="mt-2 min-h-24 w-full resize-none rounded border border-[#828fa3]/25 bg-white px-4 py-3 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white sm:min-h-28"
           />
         </label>
 
@@ -179,7 +179,7 @@ export default function EditTaskModal({
                     ),
                   )
                 }
-                className="h-10 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
               />
 
               <button
@@ -190,7 +190,7 @@ export default function EditTaskModal({
                     currentSubtasks.filter((item) => item.id !== subtask.id),
                   )
                 }
-                className="flex h-10 w-6 items-center justify-center"
+                className="flex h-10 w-6 shrink-0 items-center justify-center"
               >
                 <Image src={crossIcon} width={15} height={15} alt="" />
               </button>
@@ -233,21 +233,21 @@ export default function EditTaskModal({
         </label>
 
         <div className="mt-6 flex flex-col-reverse items-center gap-3 sm:flex-row">
-        <button
+          <button
             type="button"
             onClick={onClose}
             className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 sm:max-w-none sm:flex-1"
-        >
+          >
             Cancel
-        </button>
+          </button>
 
-        <button
+          <button
             type="submit"
             disabled={isSaveDisabled}
             className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff] disabled:cursor-not-allowed disabled:bg-[#635fc7]/40 disabled:text-white/70 sm:max-w-none sm:flex-1"
-        >
+          >
             Save Changes
-        </button>
+          </button>
         </div>
       </form>
     </div>

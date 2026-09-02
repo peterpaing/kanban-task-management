@@ -19,7 +19,7 @@ export default function DeleteTaskModal({
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-6 sm:p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-3 sm:p-4"
       onClick={onClose}
     >
       <section
@@ -27,7 +27,7 @@ export default function DeleteTaskModal({
         aria-modal="true"
         aria-labelledby="delete-task-title"
         onClick={(event) => event.stopPropagation()}
-        className="w-full max-w-[360px] rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-w-[400px] sm:p-7"
+        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[340px] overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:max-w-[400px] sm:p-7"
       >
         <div className="flex items-center gap-3">
           <FiAlertTriangle
@@ -38,13 +38,13 @@ export default function DeleteTaskModal({
 
           <h2
             id="delete-task-title"
-            className="text-lg font-bold text-[#ea5555]"
+            className="min-w-0 text-lg font-bold text-[#ea5555]"
           >
             Delete this task?
           </h2>
         </div>
 
-        <p className="mt-6 text-sm font-medium leading-6 text-[#828fa3]">
+        <p className="mt-6 break-words text-sm font-medium leading-6 text-[#828fa3]">
           Are you sure you want to delete the “{taskTitle}” task and its
           subtasks? This action cannot be reversed.
         </p>
@@ -53,7 +53,7 @@ export default function DeleteTaskModal({
           <button
             type="button"
             onClick={onDelete}
-            className="h-10 w-full max-w-[280px] rounded-full bg-[#ea5555] text-xs font-bold text-white transition-colors hover:bg-[#ff9898] sm:max-w-none"
+            className="h-10 w-full max-w-[280px] rounded-full bg-[#ea5555] text-xs font-bold text-white transition-colors hover:bg-[#ff9898] sm:max-w-none sm:flex-1"
           >
             Delete
           </button>
@@ -61,7 +61,7 @@ export default function DeleteTaskModal({
           <button
             type="button"
             onClick={onClose}
-            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 sm:max-w-none"
+            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 sm:max-w-none sm:flex-1"
           >
             Cancel
           </button>

@@ -157,6 +157,15 @@ export default function HomePage() {
     setSelectedTaskId(null);
   }
 
+  function handleUpdateTask(updatedTask: Task) {
+    const updatedTasks = (board?.tasks ?? []).map((task) =>
+      task.id === updatedTask.id ? updatedTask : task,
+    );
+
+    updateBoardTasks(updatedTasks);
+    setSelectedTaskId(null);
+  }
+
   const selectedTask =
     board?.tasks?.find((task) => task.id === selectedTaskId) ?? null;
 
@@ -172,29 +181,23 @@ export default function HomePage() {
     );
   }
 
-  function handleUpdateTask(updatedTask: Task) {
-  const updatedTasks = (board?.tasks ?? []).map((task) =>
-    task.id === updatedTask.id ? updatedTask : task,
-  );
-
-  updateBoardTasks(updatedTasks);
-  setSelectedTaskId(null);
-}
-
   return (
     <>
-      <section className="min-h-full overflow-x-auto bg-[#f4f7fd] p-4 dark:bg-[#20212c] md:p-6">
-        <div className="flex min-h-[calc(100vh-80px)] min-w-max gap-6">
+      <section className="min-h-0 flex-1 overflow-x-auto overscroll-x-contain bg-[#f4f7fd] p-4 dark:bg-[#20212c] sm:p-6">
+        <div className="flex min-h-[calc(100dvh-80px)] min-w-max snap-x snap-mandatory gap-4 pb-6 sm:gap-6">
           {board.columns.map((column, index) => {
             const columnTasks = (board.tasks ?? []).filter(
               (task) => task.status === column,
             );
 
             return (
-              <section key={column} className="w-[280px] shrink-0">
+              <section
+                key={column}
+                className="w-[calc(100vw-3rem)] max-w-[280px] shrink-0 snap-start sm:w-[280px]"
+              >
                 <h2 className="flex items-center gap-3 text-xs font-bold tracking-[0.15em] text-[#828fa3]">
                   <span
-                    className="h-4 w-4 rounded-full"
+                    className="h-4 w-4 shrink-0 rounded-full"
                     style={{
                       backgroundColor:
                         columnColors[index % columnColors.length],

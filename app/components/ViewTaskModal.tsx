@@ -100,7 +100,7 @@ export default function ViewTaskModal({
   return (
     <>
       <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 md:p-6"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-3 sm:p-4 md:p-6"
         onClick={onClose}
       >
         <section
@@ -108,17 +108,17 @@ export default function ViewTaskModal({
           aria-modal="true"
           aria-labelledby="view-task-title"
           onClick={(event) => event.stopPropagation()}
-          className="max-h-[90vh] w-full max-w-[480px] overflow-y-auto rounded-md bg-white p-6 dark:bg-[#2b2c37] md:p-8"
+          className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
         >
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-3">
             <h2
               id="view-task-title"
-              className="text-lg font-bold text-[#000112] dark:text-white"
+              className="min-w-0 break-words text-lg font-bold text-[#000112] dark:text-white"
             >
               {task.title}
             </h2>
 
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <div ref={taskMenuRef} className="relative shrink-0">
                 <button
                   type="button"
@@ -171,7 +171,7 @@ export default function ViewTaskModal({
             </div>
           </div>
 
-          <p className="mt-6 text-sm font-medium leading-6 text-[#828fa3]">
+          <p className="mt-6 break-words text-sm font-medium leading-6 text-[#828fa3]">
             {task.description || "No description for this task."}
           </p>
 
@@ -189,11 +189,11 @@ export default function ViewTaskModal({
                   type="checkbox"
                   checked={subtask.isCompleted}
                   onChange={() => onToggleSubtask(task.id, subtask.id)}
-                  className="h-4 w-4 accent-[#635fc7]"
+                  className="h-4 w-4 shrink-0 accent-[#635fc7]"
                 />
 
                 <span
-                  className={`text-xs font-bold ${
+                  className={`min-w-0 break-words text-xs font-bold ${
                     subtask.isCompleted
                       ? "text-[#828fa3] line-through"
                       : "text-[#000112] dark:text-white"
