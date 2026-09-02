@@ -163,6 +163,15 @@ export default function DynamicBoardPage() {
     setSelectedTaskId(null);
   }
 
+  function handleUpdateTask(updatedTask: Task) {
+  const updatedTasks = (board?.tasks ?? []).map((task) =>
+    task.id === updatedTask.id ? updatedTask : task,
+  );
+
+  updateBoardTasks(updatedTasks);
+  setSelectedTaskId(null);
+}
+
   const selectedTask =
     board?.tasks?.find((task) => task.id === selectedTaskId) ?? null;
 
@@ -246,6 +255,7 @@ export default function DynamicBoardPage() {
         onToggleSubtask={handleToggleSubtask}
         onChangeStatus={handleChangeTaskStatus}
         onDeleteTask={handleDeleteTask}
+        onUpdateTask={handleUpdateTask}
       />
     </>
   );

@@ -172,6 +172,15 @@ export default function HomePage() {
     );
   }
 
+  function handleUpdateTask(updatedTask: Task) {
+  const updatedTasks = (board?.tasks ?? []).map((task) =>
+    task.id === updatedTask.id ? updatedTask : task,
+  );
+
+  updateBoardTasks(updatedTasks);
+  setSelectedTaskId(null);
+}
+
   return (
     <>
       <section className="min-h-full overflow-x-auto bg-[#f4f7fd] p-4 dark:bg-[#20212c] md:p-6">
@@ -219,6 +228,7 @@ export default function HomePage() {
         onToggleSubtask={handleToggleSubtask}
         onChangeStatus={handleChangeTaskStatus}
         onDeleteTask={handleDeleteTask}
+        onUpdateTask={handleUpdateTask}
       />
     </>
   );

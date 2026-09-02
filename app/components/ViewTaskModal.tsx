@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { FiMoreVertical, FiTrash2 } from "react-icons/fi";
+import { FiEdit3, FiMoreVertical, FiTrash2 } from "react-icons/fi";
 
-import DeleteTaskModal from "@/app/components/DeleteTaskModal"
+import DeleteTaskModal from "@/app/components/DeleteTaskModal";
+import EditTaskModal from "@/app/components/EditTaskModal";
 
 type Subtask = {
   id: string;
@@ -27,6 +28,7 @@ type ViewTaskModalProps = {
   onToggleSubtask: (taskId: string, subtaskId: string) => void;
   onChangeStatus: (taskId: string, status: string) => void;
   onDeleteTask: (taskId: string) => void;
+  onUpdateTask: (task: Task) => void;
 };
 
 export default function ViewTaskModal({
@@ -37,9 +39,11 @@ export default function ViewTaskModal({
   onToggleSubtask,
   onChangeStatus,
   onDeleteTask,
+  onUpdateTask,
 }: ViewTaskModalProps) {
   const [isTaskMenuOpen, setIsTaskMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   if (!isOpen || !task) return null;
 
@@ -47,18 +51,29 @@ export default function ViewTaskModal({
     (subtask) => subtask.isCompleted,
   ).length;
 
+  function handleOpenEditModal() {
+    setIsTaskMenuOpen(false);
+    setIsEditModalOpen(true);
+  }
+
   function handleOpenDeleteModal() {
     setIsTaskMenuOpen(false);
     setIsDeleteModalOpen(true);
   }
 
   function handleDeleteTask() {
-  if (!task) return;
+    if (!task) return;
 
-  onDeleteTask(task.id);
-  setIsDeleteModalOpen(false);
-  onClose();
-}
+    onDeleteTask(task.id);
+    setIsDeleteModalOpen(false);
+    onClose();
+  }
+
+  function handleSaveTask(updatedTask: Task) {
+    onUpdateTask(updatedTask);
+    setIsEditModalOpen(false);
+    onClose();
+  }
 
   return (
     <>
@@ -98,8 +113,17 @@ export default function ViewTaskModal({
                 <div className="absolute right-0 top-full z-10 mt-2 w-40 rounded-md bg-white p-3 shadow-lg dark:bg-[#2b2c37]">
                   <button
                     type="button"
+                    onClick={handleOpenEditModal}
+                    className="flex w-full items-center gap-2 text-left text-sm font-medium text-[#828fa3] transition-colors hover:text-[#635fc7]"
+                  >
+                    <FiEdit3 size={15} aria-hidden="true" />
+                    Edit Task
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={handleOpenDeleteModal}
-                    className="flex w-full items-center gap-2 text-left text-sm font-medium text-[#ea5555] transition-colors hover:text-[#ff9898]"
+                    className="mt-4 flex w-full items-center gap-2 text-left text-sm font-medium text-[#ea5555] transition-colors hover:text-[#ff9898]"
                   >
                     <FiTrash2 size={15} aria-hidden="true" />
                     Delete Task
@@ -168,6 +192,14 @@ export default function ViewTaskModal({
         taskTitle={task.title}
         onClose={() => setIsDeleteModalOpen(false)}
         onDelete={handleDeleteTask}
+      />
+
+      <EditTaskModal
+        isOpen={isEditModalOpen}
+        task={task}
+        columns={columns}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSaveTask}
       />
     </>
   );
