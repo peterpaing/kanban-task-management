@@ -13,24 +13,9 @@ import { loadBoards, saveBoards } from "@/app/lib/boardsStorage";
 import type { Board, Task, UpdatedBoard } from "@/app/types/kanban";
 
 const initialBoards: Board[] = [
-  {
-    name: "Platform Launch",
-    href: "/",
-    columns: [],
-    tasks: [],
-  },
-  {
-    name: "Marketing Plan",
-    href: "/marketing-plan",
-    columns: [],
-    tasks: [],
-  },
-  {
-    name: "Roadmap",
-    href: "/roadmap",
-    columns: [],
-    tasks: [],
-  },
+  { name: "Platform Launch", href: "/", columns: [], tasks: [] },
+  { name: "Marketing Plan", href: "/marketing-plan", columns: [], tasks: [] },
+  { name: "Roadmap", href: "/roadmap", columns: [], tasks: [] },
 ];
 
 type AppShellProps = {
@@ -104,6 +89,20 @@ export default function AppShell({ children }: AppShellProps) {
     window.localStorage.setItem("theme", isDark ? "dark" : "light");
   }, [isDark, isThemeReady]);
 
+  useEffect(() => {
+    function handleOpenEditBoard() {
+      if (currentBoard) {
+        setIsEditBoardOpen(true);
+      }
+    }
+
+    window.addEventListener("open-edit-board", handleOpenEditBoard);
+
+    return () => {
+      window.removeEventListener("open-edit-board", handleOpenEditBoard);
+    };
+  }, [currentBoard]);
+
   function handleSaveBoard(updatedBoard: UpdatedBoard) {
     setBoards((currentBoards) =>
       currentBoards.map((board) => {
@@ -114,19 +113,15 @@ export default function AppShell({ children }: AppShellProps) {
         );
         const fallbackColumnId = updatedBoard.columns[0]?.id;
 
-        const updatedTasks = board.tasks.map((task) => {
-          if (validColumnIds.has(task.status)) return task;
-
-          return fallbackColumnId
-            ? { ...task, status: fallbackColumnId }
-            : task;
-        });
-
         return {
           ...board,
           name: updatedBoard.name,
           columns: updatedBoard.columns,
-          tasks: updatedTasks,
+          tasks: board.tasks.map((task) =>
+            validColumnIds.has(task.status) || !fallbackColumnId
+              ? task
+              : { ...task, status: fallbackColumnId },
+          ),
         };
       }),
     );
@@ -138,10 +133,7 @@ export default function AppShell({ children }: AppShellProps) {
     setBoards((currentBoards) =>
       currentBoards.map((board) =>
         board.href === pathname
-          ? {
-              ...board,
-              tasks: [...board.tasks, task],
-            }
+          ? { ...board, tasks: [...board.tasks, task] }
           : board,
       ),
     );
@@ -154,19 +146,13 @@ export default function AppShell({ children }: AppShellProps) {
       (board) => board.href !== currentBoard.href,
     );
 
-    let nextBoards = remainingBoards;
-
-    if (currentBoard.href === "/") {
-      const [nextMainBoard, ...otherBoards] = remainingBoards;
-
-      nextBoards = [
-        {
-          ...nextMainBoard,
-          href: "/",
-        },
-        ...otherBoards,
-      ];
-    }
+    const nextBoards =
+      currentBoard.href === "/"
+        ? [
+            { ...remainingBoards[0], href: "/" },
+            ...remainingBoards.slice(1),
+          ]
+        : remainingBoards;
 
     setBoards(nextBoards);
     setIsDeleteBoardOpen(false);
@@ -196,9 +182,7 @@ export default function AppShell({ children }: AppShellProps) {
           onAddTask={() => setIsAddTaskOpen(true)}
           onEditBoard={() => setIsEditBoardOpen(true)}
           onDeleteBoard={() => {
-            if (currentBoard) {
-              setIsDeleteBoardOpen(true);
-            }
+            if (currentBoard) setIsDeleteBoardOpen(true);
           }}
         />
 

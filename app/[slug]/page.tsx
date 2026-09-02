@@ -3,19 +3,13 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { FiPlus } from "react-icons/fi";
 
 import EmptyBoardState from "@/app/components/EmptyBoardState";
 import TaskCard from "@/app/components/TaskCard";
 import ViewTaskModal from "@/app/components/ViewTaskModal";
-import {
-  loadBoards,
-  saveBoards,
-} from "@/app/lib/boardsStorage";
-import type {
-  Board,
-  Task,
-  UpdatedBoard,
-} from "@/app/types/kanban";
+import { loadBoards, saveBoards } from "@/app/lib/boardsStorage";
+import type { Board, Task, UpdatedBoard } from "@/app/types/kanban";
 
 const columnColors = ["#49C4E5", "#8471F2", "#67E2AE", "#E4EBFA"];
 
@@ -150,6 +144,15 @@ export default function DynamicBoardPage() {
               </section>
             );
           })}
+
+          <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event("open-edit-board"))}
+          className="flex min-h-[calc(100dvh-140px)] w-[calc(100vw-3rem)] max-w-[280px] shrink-0 snap-start items-center justify-center gap-2 rounded-md bg-[#e9effa] px-4 text-sm font-bold text-[#828fa3] transition-colors hover:bg-[#dce5f5] hover:text-[#635fc7] dark:bg-[#2b2c37] dark:hover:bg-[#3e3f4e] sm:w-[280px]"
+        >
+          <FiPlus size={16} aria-hidden="true" />
+          <span>New Column</span>
+        </button>
         </div>
       </section>
 
