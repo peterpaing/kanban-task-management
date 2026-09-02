@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FiEdit3, FiMoreVertical, FiTrash2, FiX } from "react-icons/fi";
 
 import DeleteTaskModal from "@/app/components/DeleteTaskModal";
@@ -44,6 +44,28 @@ export default function ViewTaskModal({
   const [isTaskMenuOpen, setIsTaskMenuOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const taskMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isTaskMenuOpen) return;
+
+    function handleClickOutside(event: MouseEvent) {
+      const clickedElement = event.target as Node;
+
+      if (
+        taskMenuRef.current &&
+        !taskMenuRef.current.contains(clickedElement)
+      ) {
+        setIsTaskMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isTaskMenuOpen]);
 
   if (!isOpen || !task) return null;
 
@@ -97,40 +119,45 @@ export default function ViewTaskModal({
             </h2>
 
             <div className="flex items-center gap-1">
-              <div className="relative shrink-0">
+              <div ref={taskMenuRef} className="relative shrink-0">
                 <button
                   type="button"
                   aria-label="Open task menu"
                   aria-expanded={isTaskMenuOpen}
                   onClick={() => setIsTaskMenuOpen((isOpen) => !isOpen)}
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 active:scale-95 ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all duration-150 ease-out hover:scale-110 hover:bg-[#635fc7]/10 active:scale-95 ${
                     isTaskMenuOpen ? "scale-110 bg-[#635fc7]/10" : ""
                   }`}
                 >
                   <FiMoreVertical size={18} aria-hidden="true" />
                 </button>
 
-                {isTaskMenuOpen && (
-                  <div className="absolute right-0 top-full z-10 mt-2 w-40 rounded-md bg-white p-3 shadow-lg dark:bg-[#2b2c37]">
-                    <button
-                      type="button"
-                      onClick={handleOpenEditModal}
-                      className="flex w-full items-center gap-2 text-left text-sm font-medium text-[#828fa3] transition-colors hover:text-[#635fc7]"
-                    >
-                      <FiEdit3 size={15} aria-hidden="true" />
-                      Edit Task
-                    </button>
+                <div
+                  aria-hidden={!isTaskMenuOpen}
+                  className={`absolute right-0 top-full z-10 mt-2 w-40 origin-top-right rounded-md bg-white p-3 shadow-lg transition-all duration-150 ease-out dark:bg-[#2b2c37] ${
+                    isTaskMenuOpen
+                      ? "pointer-events-auto translate-y-0 scale-100 opacity-100"
+                      : "pointer-events-none -translate-y-1 scale-95 opacity-0"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={handleOpenEditModal}
+                    className="flex w-full items-center gap-2 text-left text-sm font-medium text-[#828fa3] transition-colors hover:text-[#635fc7]"
+                  >
+                    <FiEdit3 size={15} aria-hidden="true" />
+                    Edit Task
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={handleOpenDeleteModal}
-                      className="mt-4 flex w-full items-center gap-2 text-left text-sm font-medium text-[#ea5555] transition-colors hover:text-[#ff9898]"
-                    >
-                      <FiTrash2 size={15} aria-hidden="true" />
-                      Delete Task
-                    </button>
-                  </div>
-                )}
+                  <button
+                    type="button"
+                    onClick={handleOpenDeleteModal}
+                    className="mt-4 flex w-full items-center gap-2 text-left text-sm font-medium text-[#ea5555] transition-colors hover:text-[#ff9898]"
+                  >
+                    <FiTrash2 size={15} aria-hidden="true" />
+                    Delete Task
+                  </button>
+                </div>
               </div>
 
               <button
