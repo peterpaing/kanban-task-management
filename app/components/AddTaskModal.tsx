@@ -6,23 +6,11 @@ import { FiPlus } from "react-icons/fi";
 
 import crossIcon from "@/app/assets/icon-cross.svg";
 import useModalAccessibility from "@/app/hooks/useModalAccessibility";
-
-type Subtask = {
-  id: string;
-  title: string;
-  isCompleted: boolean;
-};
-
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  subtasks: Subtask[];
-};
+import { createId } from "@/app/lib/boardsStorage";
+import type { Column, Task } from "@/app/types/kanban";
 
 type AddTaskModalProps = {
-  columns: string[];
+  columns: Column[];
   isOpen: boolean;
   onClose: () => void;
   onCreateTask: (task: Task) => void;
@@ -49,7 +37,7 @@ export default function AddTaskModal({
     setTitle("");
     setDescription("");
     setSubtasks(DEFAULT_SUBTASKS);
-    setStatus(columns[0] ?? "");
+    setStatus(columns[0]?.id ?? "");
     setTitleError("");
   }, [columns, isOpen]);
 
@@ -66,7 +54,7 @@ export default function AddTaskModal({
     }
 
     onCreateTask({
-      id: crypto.randomUUID(),
+      id: createId(),
       title: cleanedTitle,
       description: description.trim(),
       status,
@@ -74,7 +62,7 @@ export default function AddTaskModal({
         .map((subtask) => subtask.trim())
         .filter(Boolean)
         .map((subtask) => ({
-          id: crypto.randomUUID(),
+          id: createId(),
           title: subtask,
           isCompleted: false,
         })),
@@ -107,7 +95,6 @@ export default function AddTaskModal({
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Title
-
           <input
             type="text"
             value={title}
@@ -131,11 +118,10 @@ export default function AddTaskModal({
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Description
-
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="e.g. It’s always good to take a break. This 15 minute break will recharge the batteries a little."
+            placeholder="e.g. It’s always good to take a break."
             className="mt-2 min-h-24 w-full resize-none rounded border border-[#828fa3]/25 bg-white px-4 py-3 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white sm:min-h-28"
           />
         </label>
@@ -155,11 +141,7 @@ export default function AddTaskModal({
                     ),
                   )
                 }
-                placeholder={
-                  index === 0
-                    ? "e.g. Make coffee"
-                    : "e.g. Drink coffee & smile"
-                }
+                placeholder="e.g. Make coffee"
                 className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
               />
 
@@ -173,7 +155,7 @@ export default function AddTaskModal({
                     ),
                   )
                 }
-                className="flex h-10 w-6 shrink-0 items-center justify-center rounded text-[#828fa3] outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
+                className="flex h-10 w-6 shrink-0 items-center justify-center rounded text-[#828fa3] outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
               >
                 <Image src={crossIcon} width={15} height={15} alt="" />
               </button>
@@ -186,7 +168,7 @@ export default function AddTaskModal({
           onClick={() =>
             setSubtasks((currentSubtasks) => [...currentSubtasks, ""])
           }
-          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
+          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20"
         >
           <FiPlus size={16} aria-hidden="true" />
           Add New Subtask
@@ -194,15 +176,14 @@ export default function AddTaskModal({
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Status
-
           <select
             value={status}
             onChange={(event) => setStatus(event.target.value)}
-            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
+            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
           >
             {columns.map((column) => (
-              <option key={column} value={column}>
-                {column}
+              <option key={column.id} value={column.id}>
+                {column.name}
               </option>
             ))}
           </select>
@@ -210,7 +191,7 @@ export default function AddTaskModal({
 
         <button
           type="submit"
-          className="mt-6 h-10 w-full rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
+          className="mt-6 h-10 w-full rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
         >
           Create Task
         </button>

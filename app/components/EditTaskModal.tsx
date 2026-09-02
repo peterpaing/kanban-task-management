@@ -6,35 +6,20 @@ import { FiPlus, FiX } from "react-icons/fi";
 
 import crossIcon from "@/app/assets/icon-cross.svg";
 import useModalAccessibility from "@/app/hooks/useModalAccessibility";
-
-type Subtask = {
-  id: string;
-  title: string;
-  isCompleted: boolean;
-};
-
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  subtasks: Subtask[];
-};
+import { createId } from "@/app/lib/boardsStorage";
+import type { Column, Subtask, Task } from "@/app/types/kanban";
 
 type EditTaskModalProps = {
   isOpen: boolean;
   task: Task | null;
-  columns: string[];
+  columns: Column[];
   onClose: () => void;
   onSave: (task: Task) => void;
 };
 
-function getComparableSubtasks(subtasks: Subtask[]) {
+function cleanedSubtasks(subtasks: Subtask[]) {
   return subtasks
-    .map((subtask) => ({
-      ...subtask,
-      title: subtask.title.trim(),
-    }))
+    .map((subtask) => ({ ...subtask, title: subtask.title.trim() }))
     .filter((subtask) => subtask.title);
 }
 
@@ -64,30 +49,26 @@ export default function EditTaskModal({
 
   if (!isOpen || !task) return null;
 
+  const currentTask = task;
+
   const hasChanges =
     JSON.stringify({
       title: title.trim(),
       description: description.trim(),
       status,
-      subtasks: getComparableSubtasks(subtasks),
+      subtasks: cleanedSubtasks(subtasks),
     }) !==
     JSON.stringify({
-      title: task.title.trim(),
-      description: task.description.trim(),
-      status: task.status,
-      subtasks: getComparableSubtasks(task.subtasks),
+      title: currentTask.title.trim(),
+      description: currentTask.description.trim(),
+      status: currentTask.status,
+      subtasks: cleanedSubtasks(currentTask.subtasks),
     });
-
-  const isSaveDisabled = !hasChanges || !title.trim();
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!task) return;
-
-    const cleanedTitle = title.trim();
-
-    if (!cleanedTitle) {
+    if (!title.trim()) {
       setTitleError("Task title cannot be empty.");
       return;
     }
@@ -95,11 +76,11 @@ export default function EditTaskModal({
     if (!hasChanges) return;
 
     onSave({
-      ...task,
-      title: cleanedTitle,
+      ...currentTask,
+      title: title.trim(),
       description: description.trim(),
       status,
-      subtasks: getComparableSubtasks(subtasks),
+      subtasks: cleanedSubtasks(subtasks),
     });
 
     onClose();
@@ -118,7 +99,7 @@ export default function EditTaskModal({
         aria-labelledby="edit-task-title"
         onSubmit={handleSubmit}
         onClick={(event) => event.stopPropagation()}
-        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
+        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
       >
         <div className="flex items-center justify-between gap-4">
           <h2
@@ -132,15 +113,14 @@ export default function EditTaskModal({
             type="button"
             onClick={onClose}
             aria-label="Cancel editing task"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 hover:text-[#635fc7] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
+            className="text-[#828fa3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
           >
-            <FiX size={20} aria-hidden="true" />
+            <FiX size={20} />
           </button>
         </div>
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Title
-
           <input
             type="text"
             value={title}
@@ -148,10 +128,7 @@ export default function EditTaskModal({
               setTitle(event.target.value);
               setTitleError("");
             }}
-            aria-invalid={Boolean(titleError)}
-            className={`mt-2 h-10 w-full rounded border bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white ${
-              titleError ? "border-[#ea5555]" : "border-[#828fa3]/25"
-            }`}
+            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
           />
         </label>
 
@@ -163,44 +140,42 @@ export default function EditTaskModal({
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Description
-
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            placeholder="e.g. It’s always good to take a break."
-            className="mt-2 min-h-24 w-full resize-none rounded border border-[#828fa3]/25 bg-white px-4 py-3 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white sm:min-h-28"
+            className="mt-2 min-h-24 w-full resize-none rounded border border-[#828fa3]/25 bg-white px-4 py-3 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
           />
         </label>
 
         <p className="mt-6 text-xs font-bold text-[#828fa3]">Subtasks</p>
 
         <div className="mt-2 space-y-3">
-          {subtasks.map((subtask, index) => (
+          {subtasks.map((subtask) => (
             <div key={subtask.id} className="flex items-center gap-3">
               <input
                 type="text"
                 value={subtask.title}
                 onChange={(event) =>
-                  setSubtasks((currentSubtasks) =>
-                    currentSubtasks.map((item, itemIndex) =>
-                      itemIndex === index
+                  setSubtasks((current) =>
+                    current.map((item) =>
+                      item.id === subtask.id
                         ? { ...item, title: event.target.value }
                         : item,
                     ),
                   )
                 }
-                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
+                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
               />
 
               <button
                 type="button"
                 aria-label={`Remove ${subtask.title || "subtask"}`}
                 onClick={() =>
-                  setSubtasks((currentSubtasks) =>
-                    currentSubtasks.filter((item) => item.id !== subtask.id),
+                  setSubtasks((current) =>
+                    current.filter((item) => item.id !== subtask.id),
                   )
                 }
-                className="flex h-10 w-6 shrink-0 items-center justify-center rounded text-[#828fa3] outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
+                className="text-[#828fa3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
               >
                 <Image src={crossIcon} width={15} height={15} alt="" />
               </button>
@@ -211,50 +186,45 @@ export default function EditTaskModal({
         <button
           type="button"
           onClick={() =>
-            setSubtasks((currentSubtasks) => [
-              ...currentSubtasks,
-              {
-                id: crypto.randomUUID(),
-                title: "",
-                isCompleted: false,
-              },
+            setSubtasks((current) => [
+              ...current,
+              { id: createId(), title: "", isCompleted: false },
             ])
           }
-          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
+          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
         >
-          <FiPlus size={16} aria-hidden="true" />
+          <FiPlus size={16} />
           Add New Subtask
         </button>
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Status
-
           <select
             value={status}
             onChange={(event) => setStatus(event.target.value)}
-            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
+            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
           >
             {columns.map((column) => (
-              <option key={column} value={column}>
-                {column}
+              <option key={column.id} value={column.id}>
+                {column.name}
               </option>
             ))}
           </select>
         </label>
 
-        <div className="mt-6 flex flex-col-reverse items-center gap-3 sm:flex-row">
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row">
           <button
             type="button"
             onClick={onClose}
-            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
+            className="h-10 flex-1 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
           >
             Cancel
           </button>
 
           <button
             type="submit"
-            disabled={isSaveDisabled}
-            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff] disabled:cursor-not-allowed disabled:bg-[#635fc7]/40 disabled:text-white/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
+            disabled={!hasChanges || !title.trim()}
+            className="h-10 flex-1 rounded-full bg-[#635fc7] text-xs font-bold text-white disabled:cursor-not-allowed disabled:bg-[#635fc7]/40"
           >
             Save Changes
           </button>

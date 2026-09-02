@@ -6,24 +6,24 @@ import { FiPlus } from "react-icons/fi";
 
 import crossIcon from "@/app/assets/icon-cross.svg";
 import useModalAccessibility from "@/app/hooks/useModalAccessibility";
-
-type BoardData = {
-  name: string;
-  columns: string[];
-};
-
-type UpdatedBoard = {
-  name: string;
-  columns: string[];
-};
+import { createColumn } from "@/app/lib/boardsStorage";
+import type {
+  Board,
+  Column,
+  UpdatedBoard,
+} from "@/app/types/kanban";
 
 type EditBoardModalProps = {
-  board?: BoardData | null;
+  board?: Board | null;
   taskCount: number;
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedBoard: UpdatedBoard) => void;
 };
+
+function defaultColumns() {
+  return [createColumn("Todo"), createColumn("Doing")];
+}
 
 export default function EditBoardModal({
   board,
@@ -33,7 +33,7 @@ export default function EditBoardModal({
   onSave,
 }: EditBoardModalProps) {
   const [boardName, setBoardName] = useState("");
-  const [columns, setColumns] = useState<string[]>([]);
+  const [columns, setColumns] = useState<Column[]>([]);
   const [nameError, setNameError] = useState("");
   const [columnsError, setColumnsError] = useState("");
 
@@ -44,9 +44,7 @@ export default function EditBoardModal({
 
     setBoardName(board?.name ?? "Platform Launch");
     setColumns(
-      board && board.columns.length > 0
-        ? board.columns
-        : ["Todo", "Doing"],
+      board && board.columns.length > 0 ? board.columns : defaultColumns(),
     );
     setNameError("");
     setColumnsError("");
@@ -59,8 +57,11 @@ export default function EditBoardModal({
 
     const name = boardName.trim();
     const cleanedColumns = columns
-      .map((column) => column.trim())
-      .filter(Boolean);
+      .map((column) => ({
+        ...column,
+        name: column.name.trim(),
+      }))
+      .filter((column) => column.name);
 
     if (!name) {
       setNameError("Board name cannot be empty.");
@@ -127,15 +128,17 @@ export default function EditBoardModal({
         <p className="mt-6 text-xs font-bold text-[#828fa3]">Columns</p>
 
         <div className="mt-2 space-y-3">
-          {columns.map((column, index) => (
-            <div key={index} className="flex items-center gap-3">
+          {columns.map((column) => (
+            <div key={column.id} className="flex items-center gap-3">
               <input
                 type="text"
-                value={column}
+                value={column.name}
                 onChange={(event) => {
                   setColumns((currentColumns) =>
-                    currentColumns.map((item, itemIndex) =>
-                      itemIndex === index ? event.target.value : item,
+                    currentColumns.map((item) =>
+                      item.id === column.id
+                        ? { ...item, name: event.target.value }
+                        : item,
                     ),
                   );
                   setColumnsError("");
@@ -145,12 +148,10 @@ export default function EditBoardModal({
 
               <button
                 type="button"
-                aria-label={`Remove ${column || "column"}`}
+                aria-label={`Remove ${column.name || "column"}`}
                 onClick={() => {
                   setColumns((currentColumns) =>
-                    currentColumns.filter(
-                      (_, itemIndex) => itemIndex !== index,
-                    ),
+                    currentColumns.filter((item) => item.id !== column.id),
                   );
                   setColumnsError("");
                 }}
@@ -171,7 +172,10 @@ export default function EditBoardModal({
         <button
           type="button"
           onClick={() => {
-            setColumns((currentColumns) => [...currentColumns, ""]);
+            setColumns((currentColumns) => [
+              ...currentColumns,
+              createColumn(""),
+            ]);
             setColumnsError("");
           }}
           className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"

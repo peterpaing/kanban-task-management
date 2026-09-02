@@ -4,19 +4,10 @@ import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 
 import EditBoardModal from "@/app/components/EditBoardModal";
-
-type BoardData = {
-  name: string;
-  columns: string[];
-};
-
-type UpdatedBoard = {
-  name: string;
-  columns: string[];
-};
+import type { Board, UpdatedBoard } from "@/app/types/kanban";
 
 type EmptyBoardStateProps = {
-  board: BoardData | null;
+  board: Board | null;
   onAddColumn: () => void;
   onSave: (updatedBoard: UpdatedBoard) => void;
 };
@@ -52,6 +43,7 @@ export default function EmptyBoardState({
 
       <EditBoardModal
         board={board}
+        taskCount={board?.tasks.length ?? 0}
         isOpen={isEditBoardOpen}
         onClose={() => setIsEditBoardOpen(false)}
         onSave={onSave}

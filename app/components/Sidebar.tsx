@@ -20,12 +20,14 @@ import lightLogo from "@/app/assets/logo-light.svg";
 import lightThemeIcon from "@/app/assets/icon-light-theme.svg";
 import showSidebar from "@/app/assets/icon-show-sidebar.svg";
 import useModalAccessibility from "@/app/hooks/useModalAccessibility";
-
-type Board = {
-  name: string;
-  href: string;
-  columns: string[];
-};
+import {
+  createColumn,
+  createId,
+} from "@/app/lib/boardsStorage";
+import type {
+  Board,
+  Column,
+} from "@/app/types/kanban";
 
 type SidebarProps = {
   boards: Board[];
@@ -38,7 +40,9 @@ type SidebarProps = {
   setIsSidebarHidden: (isHidden: boolean) => void;
 };
 
-const DEFAULT_COLUMNS = ["Todo", "Doing"];
+function defaultColumns(): Column[] {
+  return [createColumn("Todo"), createColumn("Doing")];
+}
 
 export default function Sidebar({
   boards,
@@ -52,13 +56,13 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [boardName, setBoardName] = useState("");
-  const [columns, setColumns] = useState<string[]>([...DEFAULT_COLUMNS]);
+  const [columns, setColumns] = useState<Column[]>(defaultColumns);
   const [boardNameError, setBoardNameError] = useState("");
 
   function closeCreateBoardModal() {
     setIsCreateBoardOpen(false);
     setBoardName("");
-    setColumns([...DEFAULT_COLUMNS]);
+    setColumns(defaultColumns());
     setBoardNameError("");
   }
 
@@ -106,14 +110,20 @@ export default function Sidebar({
       return;
     }
 
-    const slug = createUniqueSlug(name);
+    const cleanedColumns = columns
+      .map((column) => ({
+        ...column,
+        name: column.name.trim(),
+      }))
+      .filter((column) => column.name);
 
     setBoards((currentBoards) => [
       ...currentBoards,
       {
         name,
-        href: `/${slug}`,
-        columns: columns.map((column) => column.trim()).filter(Boolean),
+        href: `/${createUniqueSlug(name)}`,
+        columns: cleanedColumns,
+        tasks: [],
       },
     ]);
 
@@ -270,15 +280,17 @@ export default function Sidebar({
             <p className="mt-6 text-xs font-bold text-[#828fa3]">Columns</p>
 
             <div className="mt-2 space-y-3">
-              {columns.map((column, index) => (
-                <div key={index} className="flex items-center gap-3">
+              {columns.map((column) => (
+                <div key={column.id} className="flex items-center gap-3">
                   <input
                     type="text"
-                    value={column}
+                    value={column.name}
                     onChange={(event) =>
                       setColumns((currentColumns) =>
-                        currentColumns.map((item, itemIndex) =>
-                          itemIndex === index ? event.target.value : item,
+                        currentColumns.map((item) =>
+                          item.id === column.id
+                            ? { ...item, name: event.target.value }
+                            : item,
                         ),
                       )
                     }
@@ -287,11 +299,11 @@ export default function Sidebar({
 
                   <button
                     type="button"
-                    aria-label={`Remove ${column || "column"}`}
+                    aria-label={`Remove ${column.name || "column"}`}
                     onClick={() =>
                       setColumns((currentColumns) =>
                         currentColumns.filter(
-                          (_, itemIndex) => itemIndex !== index,
+                          (item) => item.id !== column.id,
                         ),
                       )
                     }
@@ -306,7 +318,10 @@ export default function Sidebar({
             <button
               type="button"
               onClick={() =>
-                setColumns((currentColumns) => [...currentColumns, ""])
+                setColumns((currentColumns) => [
+                  ...currentColumns,
+                  createColumn(""),
+                ])
               }
               className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
             >

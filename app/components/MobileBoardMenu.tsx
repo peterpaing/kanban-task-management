@@ -9,12 +9,7 @@ import boardIcon from "@/app/assets/icon-board.svg";
 import darkThemeIcon from "@/app/assets/icon-dark-theme.svg";
 import lightThemeIcon from "@/app/assets/icon-light-theme.svg";
 import useModalAccessibility from "@/app/hooks/useModalAccessibility";
-
-type Board = {
-  name: string;
-  href: string;
-  columns: string[];
-};
+import type { Board } from "@/app/types/kanban";
 
 type MobileBoardMenuProps = {
   boards: Board[];

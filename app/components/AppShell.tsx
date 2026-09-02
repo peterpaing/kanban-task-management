@@ -9,29 +9,15 @@ import EditBoardModal from "@/app/components/EditBoardModal";
 import Header from "@/app/components/Header";
 import MobileBoardMenu from "@/app/components/MobileBoardMenu";
 import Sidebar from "@/app/components/Sidebar";
-
-type Subtask = {
-  id: string;
-  title: string;
-  isCompleted: boolean;
-};
-
-type Task = {
-  id: string;
-  title: string;
-  description: string;
-  status: string;
-  subtasks: Subtask[];
-};
-
-type Board = {
-  name: string;
-  href: string;
-  columns: string[];
-  tasks?: Task[];
-};
-
-const BOARDS_STORAGE_KEY = "kanban-boards-v2";
+import {
+  loadBoards,
+  saveBoards,
+} from "@/app/lib/boardsStorage";
+import type {
+  Board,
+  Task,
+  UpdatedBoard,
+} from "@/app/types/kanban";
 
 const initialBoards: Board[] = [
   {
@@ -77,27 +63,18 @@ export default function AppShell({ children }: AppShellProps) {
     boards.find((board) => board.href === pathname) ?? null;
 
   useEffect(() => {
-    const savedBoards = window.localStorage.getItem(BOARDS_STORAGE_KEY);
-
-    if (savedBoards) {
-      setBoards(JSON.parse(savedBoards));
-    }
-
+    setBoards(loadBoards(initialBoards));
     setIsBoardsReady(true);
   }, []);
 
   useEffect(() => {
     function syncBoardsFromStorage() {
-      const savedBoards = window.localStorage.getItem(BOARDS_STORAGE_KEY);
-
-      if (!savedBoards) return;
-
-      const savedBoardsData: Board[] = JSON.parse(savedBoards);
+      const savedBoards = loadBoards(initialBoards);
 
       setBoards((currentBoards) =>
-        JSON.stringify(currentBoards) === JSON.stringify(savedBoardsData)
+        JSON.stringify(currentBoards) === JSON.stringify(savedBoards)
           ? currentBoards
-          : savedBoardsData,
+          : savedBoards,
       );
     }
 
@@ -111,11 +88,7 @@ export default function AppShell({ children }: AppShellProps) {
   useEffect(() => {
     if (!isBoardsReady) return;
 
-    window.localStorage.setItem(
-      BOARDS_STORAGE_KEY,
-      JSON.stringify(boards),
-    );
-
+    saveBoards(boards);
     window.dispatchEvent(new Event("boards-updated"));
   }, [boards, isBoardsReady]);
 
@@ -134,38 +107,22 @@ export default function AppShell({ children }: AppShellProps) {
     window.localStorage.setItem("theme", isDark ? "dark" : "light");
   }, [isDark, isThemeReady]);
 
-  function handleSaveBoard(updatedBoard: {
-    name: string;
-    columns: string[];
-  }) {
+  function handleSaveBoard(updatedBoard: UpdatedBoard) {
     setBoards((currentBoards) =>
       currentBoards.map((board) => {
         if (board.href !== pathname) return board;
 
-        const fallbackColumn = updatedBoard.columns[0];
+        const validColumnIds = new Set(
+          updatedBoard.columns.map((column) => column.id),
+        );
+        const fallbackColumnId = updatedBoard.columns[0]?.id;
 
-        const updatedTasks = (board.tasks ?? []).map((task) => {
-          const oldColumnIndex = board.columns.indexOf(task.status);
+        const updatedTasks = board.tasks.map((task) => {
+          if (validColumnIds.has(task.status)) return task;
 
-          if (oldColumnIndex === -1) return task;
-
-          const renamedColumn = updatedBoard.columns[oldColumnIndex];
-
-          if (renamedColumn) {
-            return {
-              ...task,
-              status: renamedColumn,
-            };
-          }
-
-          if (fallbackColumn) {
-            return {
-              ...task,
-              status: fallbackColumn,
-            };
-          }
-
-          return task;
+          return fallbackColumnId
+            ? { ...task, status: fallbackColumnId }
+            : task;
         });
 
         return {
@@ -186,7 +143,7 @@ export default function AppShell({ children }: AppShellProps) {
         board.href === pathname
           ? {
               ...board,
-              tasks: [...(board.tasks ?? []), task],
+              tasks: [...board.tasks, task],
             }
           : board,
       ),
@@ -269,7 +226,7 @@ export default function AppShell({ children }: AppShellProps) {
 
       <EditBoardModal
         board={currentBoard}
-        taskCount={currentBoard?.tasks?.length ?? 0}
+        taskCount={currentBoard?.tasks.length ?? 0}
         isOpen={isEditBoardOpen}
         onClose={() => setIsEditBoardOpen(false)}
         onSave={handleSaveBoard}
