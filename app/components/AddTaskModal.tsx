@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState, type SyntheticEvent } from "react";
-import { FiPlus } from "react-icons/fi";
+import { FiPlus, FiX } from "react-icons/fi";
 
-import crossIcon from "@/app/assets/icon-cross.svg";
 import useModalAccessibility from "@/app/hooks/useModalAccessibility";
 import { createId } from "@/app/lib/boardsStorage";
 import type { Column, Task } from "@/app/types/kanban";
@@ -88,12 +86,23 @@ export default function AddTaskModal({
         onClick={(event) => event.stopPropagation()}
         className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
       >
-        <h2
-          id="add-task-title"
-          className="text-lg font-bold text-[#000112] dark:text-white"
-        >
-          Add New Task
-        </h2>
+        <div className="flex items-center justify-between gap-4">
+          <h2
+            id="add-task-title"
+            className="text-lg font-bold text-[#000112] dark:text-white"
+          >
+            Add New Task
+          </h2>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close add task modal"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 hover:text-[#635fc7] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
+          >
+            <FiX size={20} aria-hidden="true" />
+          </button>
+        </div>
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Title
@@ -157,9 +166,9 @@ export default function AddTaskModal({
                     ),
                   )
                 }
-                className="flex h-10 w-6 shrink-0 items-center justify-center rounded text-[#828fa3] outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
+                className="flex h-10 w-8 shrink-0 items-center justify-center rounded text-[#828fa3] transition-colors hover:text-[#ea5555] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
               >
-                <Image src={crossIcon} width={15} height={15} alt="" />
+                <FiX size={22} aria-hidden="true" />
               </button>
             </div>
           ))}
