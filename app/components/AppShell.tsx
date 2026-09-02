@@ -3,16 +3,32 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
+import AddTaskModal from "@/app/components/AddTaskModal";
 import DeleteBoardModal from "@/app/components/DeleteBoardModal";
 import EditBoardModal from "@/app/components/EditBoardModal";
 import Header from "@/app/components/Header";
 import MobileBoardMenu from "@/app/components/MobileBoardMenu";
 import Sidebar from "@/app/components/Sidebar";
 
+type Subtask = {
+  id: string;
+  title: string;
+  isCompleted: boolean;
+};
+
+type Task = {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  subtasks: Subtask[];
+};
+
 type Board = {
   name: string;
   href: string;
   columns: string[];
+  tasks?: Task[];
 };
 
 const BOARDS_STORAGE_KEY = "kanban-boards-v2";
@@ -22,16 +38,19 @@ const initialBoards: Board[] = [
     name: "Platform Launch",
     href: "/",
     columns: [],
+    tasks: [],
   },
   {
     name: "Marketing Plan",
     href: "/marketing-plan",
     columns: [],
+    tasks: [],
   },
   {
     name: "Roadmap",
     href: "/roadmap",
     columns: [],
+    tasks: [],
   },
 ];
 
@@ -52,6 +71,7 @@ export default function AppShell({ children }: AppShellProps) {
   const [isCreateBoardOpen, setIsCreateBoardOpen] = useState(false);
   const [isEditBoardOpen, setIsEditBoardOpen] = useState(false);
   const [isDeleteBoardOpen, setIsDeleteBoardOpen] = useState(false);
+  const [isAddTaskOpen, setIsAddTaskOpen] = useState(false);
 
   const currentBoard =
     boards.find((board) => board.href === pathname) ?? null;
@@ -108,6 +128,21 @@ export default function AppShell({ children }: AppShellProps) {
     );
   }
 
+  function handleCreateTask(task: Task) {
+    if (!currentBoard) return;
+
+    setBoards((currentBoards) =>
+      currentBoards.map((board) =>
+        board.href === pathname
+          ? {
+              ...board,
+              tasks: [...(board.tasks ?? []), task],
+            }
+          : board,
+      ),
+    );
+  }
+
   function handleDeleteBoard() {
     if (!currentBoard || boards.length <= 1) return;
 
@@ -150,9 +185,11 @@ export default function AppShell({ children }: AppShellProps) {
       <div className="flex min-w-0 flex-1 flex-col">
         <Header
           boardName={currentBoard?.name ?? "Board Not Found"}
+          hasColumns={Boolean(currentBoard?.columns.length)}
           showDesktopLogo={isSidebarHidden}
           isMobileMenuOpen={isMobileMenuOpen}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+          onAddTask={() => setIsAddTaskOpen(true)}
           onEditBoard={() => setIsEditBoardOpen(true)}
           onDeleteBoard={() => {
             if (currentBoard) {
@@ -171,6 +208,13 @@ export default function AppShell({ children }: AppShellProps) {
         onClose={() => setIsMobileMenuOpen(false)}
         onCreateBoard={() => setIsCreateBoardOpen(true)}
         onToggleTheme={() => setIsDark((currentTheme) => !currentTheme)}
+      />
+
+      <AddTaskModal
+        columns={currentBoard?.columns ?? []}
+        isOpen={isAddTaskOpen}
+        onClose={() => setIsAddTaskOpen(false)}
+        onCreateTask={handleCreateTask}
       />
 
       <EditBoardModal

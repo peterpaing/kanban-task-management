@@ -19,13 +19,17 @@ type HeaderProps = {
   onOpenMobileMenu: () => void;
   onEditBoard: () => void;
   onDeleteBoard: () => void;
+  hasColumns: boolean;
+  onAddTask: () => void;
 };
 
 export default function Header({
   boardName,
+  hasColumns,
   showDesktopLogo,
   isMobileMenuOpen,
   onOpenMobileMenu,
+  onAddTask,
   onEditBoard,
   onDeleteBoard,
 }: HeaderProps) {
@@ -110,10 +114,16 @@ export default function Header({
       </div>
 
       <div className="flex items-center gap-3">
-        <button
+       <button
           type="button"
           aria-label="Add new task"
-          className="flex h-8 w-12 items-center justify-center gap-2 rounded-full bg-[#a8a4ff] text-white transition-colors duration-300 ease-in-out hover:bg-[#635fc7] dark:bg-[#635fc7] dark:hover:bg-[#a8a4ff] md:w-auto md:px-4"
+          disabled={!hasColumns}
+          onClick={onAddTask}
+          className={`flex h-8 w-12 items-center justify-center gap-2 rounded-full text-white transition-colors duration-300 ease-in-out md:w-auto md:px-4 ${
+            hasColumns
+              ? "bg-[#635fc7] hover:bg-[#a8a4ff]"
+              : "cursor-not-allowed bg-[#a8a4ff] dark:bg-[#635fc7]/50"
+          }`}
         >
           <Image src={addTaskIcon} width={12} height={12} alt="" />
 
