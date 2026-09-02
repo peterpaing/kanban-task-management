@@ -87,12 +87,35 @@ export default function AppShell({ children }: AppShellProps) {
   }, []);
 
   useEffect(() => {
+    function syncBoardsFromStorage() {
+      const savedBoards = window.localStorage.getItem(BOARDS_STORAGE_KEY);
+
+      if (!savedBoards) return;
+
+      const savedBoardsData: Board[] = JSON.parse(savedBoards);
+
+      setBoards((currentBoards) =>
+        JSON.stringify(currentBoards) === JSON.stringify(savedBoardsData)
+          ? currentBoards
+          : savedBoardsData,
+      );
+    }
+
+    window.addEventListener("boards-updated", syncBoardsFromStorage);
+
+    return () => {
+      window.removeEventListener("boards-updated", syncBoardsFromStorage);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!isBoardsReady) return;
 
     window.localStorage.setItem(
       BOARDS_STORAGE_KEY,
       JSON.stringify(boards),
     );
+
     window.dispatchEvent(new Event("boards-updated"));
   }, [boards, isBoardsReady]);
 

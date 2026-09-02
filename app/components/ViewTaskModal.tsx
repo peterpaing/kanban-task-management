@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FiEdit3, FiMoreVertical, FiTrash2 } from "react-icons/fi";
+import { FiEdit3, FiMoreVertical, FiTrash2, FiX } from "react-icons/fi";
 
 import DeleteTaskModal from "@/app/components/DeleteTaskModal";
 import EditTaskModal from "@/app/components/EditTaskModal";
@@ -96,40 +96,51 @@ export default function ViewTaskModal({
               {task.title}
             </h2>
 
-            <div className="relative shrink-0">
+            <div className="flex items-center gap-1">
+              <div className="relative shrink-0">
+                <button
+                  type="button"
+                  aria-label="Open task menu"
+                  aria-expanded={isTaskMenuOpen}
+                  onClick={() => setIsTaskMenuOpen((isOpen) => !isOpen)}
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 active:scale-95 ${
+                    isTaskMenuOpen ? "scale-110 bg-[#635fc7]/10" : ""
+                  }`}
+                >
+                  <FiMoreVertical size={18} aria-hidden="true" />
+                </button>
+
+                {isTaskMenuOpen && (
+                  <div className="absolute right-0 top-full z-10 mt-2 w-40 rounded-md bg-white p-3 shadow-lg dark:bg-[#2b2c37]">
+                    <button
+                      type="button"
+                      onClick={handleOpenEditModal}
+                      className="flex w-full items-center gap-2 text-left text-sm font-medium text-[#828fa3] transition-colors hover:text-[#635fc7]"
+                    >
+                      <FiEdit3 size={15} aria-hidden="true" />
+                      Edit Task
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleOpenDeleteModal}
+                      className="mt-4 flex w-full items-center gap-2 text-left text-sm font-medium text-[#ea5555] transition-colors hover:text-[#ff9898]"
+                    >
+                      <FiTrash2 size={15} aria-hidden="true" />
+                      Delete Task
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <button
                 type="button"
-                aria-label="Open task menu"
-                aria-expanded={isTaskMenuOpen}
-                onClick={() => setIsTaskMenuOpen((isOpen) => !isOpen)}
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 active:scale-95 ${
-                  isTaskMenuOpen ? "scale-110 bg-[#635fc7]/10" : ""
-                }`}
+                onClick={onClose}
+                aria-label="Close task"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 hover:text-[#635fc7] active:scale-95"
               >
-                <FiMoreVertical size={18} aria-hidden="true" />
+                <FiX size={20} aria-hidden="true" />
               </button>
-
-              {isTaskMenuOpen && (
-                <div className="absolute right-0 top-full z-10 mt-2 w-40 rounded-md bg-white p-3 shadow-lg dark:bg-[#2b2c37]">
-                  <button
-                    type="button"
-                    onClick={handleOpenEditModal}
-                    className="flex w-full items-center gap-2 text-left text-sm font-medium text-[#828fa3] transition-colors hover:text-[#635fc7]"
-                  >
-                    <FiEdit3 size={15} aria-hidden="true" />
-                    Edit Task
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleOpenDeleteModal}
-                    className="mt-4 flex w-full items-center gap-2 text-left text-sm font-medium text-[#ea5555] transition-colors hover:text-[#ff9898]"
-                  >
-                    <FiTrash2 size={15} aria-hidden="true" />
-                    Delete Task
-                  </button>
-                </div>
-              )}
             </div>
           </div>
 
@@ -184,6 +195,14 @@ export default function ViewTaskModal({
               ))}
             </select>
           </label>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="mt-6 h-10 w-full rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
+          >
+            Done
+          </button>
         </section>
       </div>
 
