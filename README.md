@@ -100,6 +100,6 @@ The project is based on the Kanban Task Management Web App design challenge from
 - Repository: `https://github.com/peterpaing/kanban-task-management.git`
 
 
-## Author
+## License
 
-Your Name
+This project was built as a portfolio project for learning and demonstration purposes.
