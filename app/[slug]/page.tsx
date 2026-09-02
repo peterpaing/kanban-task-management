@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -83,7 +84,28 @@ export default function DynamicBoardPage() {
     return null;
   }
 
-  if (!board || board.columns.length === 0) {
+  if (!board) {
+    return (
+      <section className="flex min-h-full flex-1 flex-col items-center justify-center bg-[#f4f7fd] px-4 text-center dark:bg-[#20212c]">
+        <h1 className="text-xl font-bold text-[#000112] dark:text-white">
+          Board not found
+        </h1>
+
+        <p className="mt-3 text-sm font-medium text-[#828fa3]">
+          This board may have been deleted or its link is invalid.
+        </p>
+
+        <Link
+          href="/"
+          className="mt-6 rounded-full bg-[#635fc7] px-5 py-3 text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
+        >
+          Go to Home Board
+        </Link>
+      </section>
+    );
+  }
+
+  if (board.columns.length === 0) {
     return (
       <EmptyBoardState
         board={board}

@@ -109,16 +109,15 @@ export default function AppShell({ children }: AppShellProps) {
   }
 
   function handleDeleteBoard() {
-    if (!currentBoard) return;
+    if (!currentBoard || boards.length <= 1) return;
 
     const remainingBoards = boards.filter(
       (board) => board.href !== currentBoard.href,
     );
 
     let nextBoards = remainingBoards;
-    let nextPath = "/";
 
-    if (currentBoard.href === "/" && remainingBoards.length > 0) {
+    if (currentBoard.href === "/") {
       const [nextMainBoard, ...otherBoards] = remainingBoards;
 
       nextBoards = [
@@ -132,7 +131,7 @@ export default function AppShell({ children }: AppShellProps) {
 
     setBoards(nextBoards);
     setIsDeleteBoardOpen(false);
-    router.replace(nextPath);
+    router.replace("/");
   }
 
   return (
@@ -150,7 +149,7 @@ export default function AppShell({ children }: AppShellProps) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Header
-          boardName={currentBoard?.name ?? "No Boards"}
+          boardName={currentBoard?.name ?? "Board Not Found"}
           showDesktopLogo={isSidebarHidden}
           isMobileMenuOpen={isMobileMenuOpen}
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
@@ -184,6 +183,7 @@ export default function AppShell({ children }: AppShellProps) {
       <DeleteBoardModal
         isOpen={isDeleteBoardOpen}
         boardName={currentBoard?.name ?? ""}
+        canDelete={boards.length > 1}
         onClose={() => setIsDeleteBoardOpen(false)}
         onDelete={handleDeleteBoard}
       />
