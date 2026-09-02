@@ -52,11 +52,33 @@ export default function Sidebar({
   const pathname = usePathname();
   const [boardName, setBoardName] = useState("");
   const [columns, setColumns] = useState<string[]>([...DEFAULT_COLUMNS]);
+  const [boardNameError, setBoardNameError] = useState("");
 
   function closeCreateBoardModal() {
     setIsCreateBoardOpen(false);
     setBoardName("");
     setColumns([...DEFAULT_COLUMNS]);
+    setBoardNameError("");
+  }
+
+  function createUniqueSlug(name: string) {
+    const baseSlug =
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "") || "board";
+
+    const usedHrefs = new Set(boards.map((board) => board.href));
+
+    let slug = baseSlug;
+    let number = 2;
+
+    while (usedHrefs.has(`/${slug}`)) {
+      slug = `${baseSlug}-${number}`;
+      number += 1;
+    }
+
+    return slug;
   }
 
   function handleCreateBoard(event: SyntheticEvent<HTMLFormElement>) {
@@ -64,12 +86,21 @@ export default function Sidebar({
 
     const name = boardName.trim();
 
-    if (!name) return;
+    if (!name) {
+      setBoardNameError("Board name cannot be empty.");
+      return;
+    }
 
-    const slug = name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    const hasSameName = boards.some(
+      (board) => board.name.trim().toLowerCase() === name.toLowerCase(),
+    );
+
+    if (hasSameName) {
+      setBoardNameError("A board with this name already exists.");
+      return;
+    }
+
+    const slug = createUniqueSlug(name);
 
     setBoards((currentBoards) => [
       ...currentBoards,
@@ -198,11 +229,25 @@ export default function Sidebar({
               <input
                 type="text"
                 value={boardName}
-                onChange={(event) => setBoardName(event.target.value)}
+                onChange={(event) => {
+                  setBoardName(event.target.value);
+                  setBoardNameError("");
+                }}
                 placeholder="e.g. Web Design"
-                className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                aria-invalid={Boolean(boardNameError)}
+                className={`mt-2 h-10 w-full rounded border px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white ${
+                  boardNameError
+                    ? "border-[#ea5555]"
+                    : "border-[#828fa3]/25"
+                }`}
               />
             </label>
+
+            {boardNameError && (
+              <p className="mt-2 text-xs font-bold text-[#ea5555]">
+                {boardNameError}
+              </p>
+            )}
 
             <p className="mt-6 text-xs font-bold text-[#828fa3]">Columns</p>
 
@@ -262,7 +307,7 @@ export default function Sidebar({
 
               <button
                 type="submit"
-                className="h-10 flex-1 rounded-full bg-[#635fc7] text-xs font-bold text-white hover:bg-[#a8a4ff]"
+                className="h-10 flex-1 rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
               >
                 Create New Board
               </button>
