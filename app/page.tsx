@@ -91,7 +91,7 @@ export default function HomePage() {
             return (
               <section
                 key={column.id}
-                className="w-[calc(100vw-3rem)] max-w-[280px] shrink-0 snap-start sm:w-[280px]"
+                className="w-[280px] shrink-0 snap-start"
               >
                 <h2 className="flex items-center gap-3 text-xs font-bold tracking-[0.15em] text-[#828fa3]">
                   <span
@@ -119,13 +119,15 @@ export default function HomePage() {
           })}
 
           <button
-          type="button"
-          onClick={() => window.dispatchEvent(new Event("open-edit-board"))}
-          className="flex min-h-[calc(100dvh-140px)] w-[calc(100vw-3rem)] max-w-[280px] shrink-0 snap-start items-center justify-center gap-2 rounded-md bg-[#e9effa] px-4 text-sm font-bold text-[#828fa3] transition-colors hover:bg-[#dce5f5] hover:text-[#635fc7] dark:bg-[#2b2c37] dark:hover:bg-[#3e3f4e] sm:w-[280px]"
-        >
-          <FiPlus size={16} aria-hidden="true" />
-          <span>New Column</span>
-        </button>
+            type="button"
+            onClick={() =>
+              window.dispatchEvent(new Event("open-edit-board"))
+            }
+            className="flex min-h-[calc(100dvh-140px)] w-[280px] shrink-0 snap-start items-center justify-center gap-2 rounded-md bg-[#e9effa] px-4 text-sm font-bold text-[#828fa3] transition-colors hover:bg-[#dce5f5] hover:text-[#635fc7] dark:bg-[#2b2c37] dark:hover:bg-[#3e3f4e]"
+          >
+            <FiPlus size={16} aria-hidden="true" />
+            <span>New Column</span>
+          </button>
         </div>
       </section>
 

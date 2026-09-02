@@ -1,10 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { FiPlus, FiX } from "react-icons/fi";
 
-import crossIcon from "@/app/assets/icon-cross.svg";
 import useModalAccessibility from "@/app/hooks/useModalAccessibility";
 import { createId } from "@/app/lib/boardsStorage";
 import type { Column, Subtask, Task } from "@/app/types/kanban";
@@ -35,8 +33,9 @@ export default function EditTaskModal({
   const [subtasks, setSubtasks] = useState<Subtask[]>([]);
   const [status, setStatus] = useState("");
   const [titleError, setTitleError] = useState("");
+
   const modalRef = useModalAccessibility<HTMLFormElement>(isOpen, onClose);
-/* eslint-disable react-hooks/set-state-in-effect */
+
   useEffect(() => {
     if (!isOpen || !task) return;
 
@@ -46,7 +45,7 @@ export default function EditTaskModal({
     setStatus(task.status);
     setTitleError("");
   }, [isOpen, task]);
-/* eslint-enable react-hooks/set-state-in-effect */
+
   if (!isOpen || !task) return null;
 
   const currentTask = task;
@@ -113,14 +112,15 @@ export default function EditTaskModal({
             type="button"
             onClick={onClose}
             aria-label="Cancel editing task"
-            className="text-[#828fa3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 hover:text-[#635fc7] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
           >
-            <FiX size={20} />
+            <FiX size={20} aria-hidden="true" />
           </button>
         </div>
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Title
+
           <input
             type="text"
             value={title}
@@ -128,7 +128,7 @@ export default function EditTaskModal({
               setTitle(event.target.value);
               setTitleError("");
             }}
-            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none transition-colors hover:border-[#635fc7] focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/30 dark:bg-[#2b2c37] dark:text-white"
           />
         </label>
 
@@ -140,10 +140,11 @@ export default function EditTaskModal({
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Description
+
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
-            className="mt-2 min-h-24 w-full resize-none rounded border border-[#828fa3]/25 bg-white px-4 py-3 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+            className="mt-2 min-h-24 w-full resize-none rounded border border-[#828fa3]/25 bg-white px-4 py-3 text-sm text-[#000112] outline-none transition-colors hover:border-[#635fc7] focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/30 dark:bg-[#2b2c37] dark:text-white"
           />
         </label>
 
@@ -164,7 +165,7 @@ export default function EditTaskModal({
                     ),
                   )
                 }
-                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none transition-colors hover:border-[#635fc7] focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/30 dark:bg-[#2b2c37] dark:text-white"
               />
 
               <button
@@ -175,9 +176,9 @@ export default function EditTaskModal({
                     current.filter((item) => item.id !== subtask.id),
                   )
                 }
-                className="text-[#828fa3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
+                className="flex h-10 w-8 shrink-0 items-center justify-center rounded text-[#828fa3] transition-all hover:scale-110 hover:text-[#ea5555] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
               >
-                <Image src={crossIcon} width={15} height={15} alt="" />
+                <FiX size={24} aria-hidden="true" />
               </button>
             </div>
           ))}
@@ -191,18 +192,19 @@ export default function EditTaskModal({
               { id: createId(), title: "", isCompleted: false },
             ])
           }
-          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7]"
+          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-all hover:bg-[#635fc7]/20 hover:shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
         >
-          <FiPlus size={16} />
+          <FiPlus size={16} aria-hidden="true" />
           Add New Subtask
         </button>
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Status
+
           <select
             value={status}
             onChange={(event) => setStatus(event.target.value)}
-            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+            className="mt-2 h-10 w-full cursor-pointer rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none transition-colors hover:border-[#635fc7] focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/30 dark:bg-[#2b2c37] dark:text-white"
           >
             {columns.map((column) => (
               <option key={column.id} value={column.id}>
@@ -213,22 +215,22 @@ export default function EditTaskModal({
         </label>
 
         <div className="mt-6 flex flex-col-reverse items-center gap-3 sm:flex-row">
-        <button
-          type="button"
-          onClick={onClose}
-          className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] sm:max-w-none sm:flex-1"
-        >
-          Cancel
-        </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-all hover:bg-[#635fc7]/20 hover:shadow-sm active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
+          >
+            Cancel
+          </button>
 
-        <button
-          type="submit"
-          disabled={!hasChanges || !title.trim()}
-          className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7] text-xs font-bold text-white disabled:cursor-not-allowed disabled:bg-[#635fc7]/40 sm:max-w-none sm:flex-1"
-        >
-          Save Changes
-        </button>
-      </div>
+          <button
+            type="submit"
+            disabled={!hasChanges || !title.trim()}
+            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7] text-xs font-bold text-white transition-all enabled:hover:bg-[#a8a4ff] enabled:hover:shadow-md enabled:active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-[#635fc7]/40 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
+          >
+            Save Changes
+          </button>
+        </div>
       </form>
     </div>
   );

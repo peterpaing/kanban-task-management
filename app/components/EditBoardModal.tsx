@@ -1,17 +1,13 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useState, type SyntheticEvent } from "react";
-import { FiPlus } from "react-icons/fi";
+/* eslint-disable react-hooks/set-state-in-effect */
 
-import crossIcon from "@/app/assets/icon-cross.svg";
+import { useEffect, useState, type SyntheticEvent } from "react";
+import { FiPlus, FiX } from "react-icons/fi";
+
 import useModalAccessibility from "@/app/hooks/useModalAccessibility";
 import { createColumn } from "@/app/lib/boardsStorage";
-import type {
-  Board,
-  Column,
-  UpdatedBoard,
-} from "@/app/types/kanban";
+import type { Board, Column, UpdatedBoard } from "@/app/types/kanban";
 
 type EditBoardModalProps = {
   board?: Board | null;
@@ -38,7 +34,7 @@ export default function EditBoardModal({
   const [columnsError, setColumnsError] = useState("");
 
   const modalRef = useModalAccessibility<HTMLFormElement>(isOpen, onClose);
-/* eslint-disable react-hooks/set-state-in-effect */
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -49,7 +45,7 @@ export default function EditBoardModal({
     setNameError("");
     setColumnsError("");
   }, [board, isOpen]);
-/* eslint-enable react-hooks/set-state-in-effect */
+
   if (!isOpen) return null;
 
   function handleSubmit(event: SyntheticEvent<HTMLFormElement>) {
@@ -98,12 +94,23 @@ export default function EditBoardModal({
         onClick={(event) => event.stopPropagation()}
         className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
       >
-        <h2
-          id="edit-board-title"
-          className="text-lg font-bold text-[#000112] dark:text-white"
-        >
-          Edit Board
-        </h2>
+        <div className="flex items-center justify-between gap-4">
+          <h2
+            id="edit-board-title"
+            className="text-lg font-bold text-[#000112] dark:text-white"
+          >
+            Edit Board
+          </h2>
+
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close edit board modal"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 hover:text-[#635fc7] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
+          >
+            <FiX size={20} aria-hidden="true" />
+          </button>
+        </div>
 
         <label className="mt-6 block text-xs font-bold text-[#828fa3]">
           Name
@@ -115,35 +122,33 @@ export default function EditBoardModal({
               setBoardName(event.target.value);
               setNameError("");
             }}
-            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
+            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none transition-colors focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/30 dark:bg-[#2b2c37] dark:text-white"
           />
         </label>
 
         {nameError && (
-          <p className="mt-2 text-xs font-bold text-[#ea5555]">
-            {nameError}
-          </p>
+          <p className="mt-2 text-xs font-bold text-[#ea5555]">{nameError}</p>
         )}
 
         <p className="mt-6 text-xs font-bold text-[#828fa3]">Columns</p>
 
         <div className="mt-2 space-y-3">
-          {columns.map((column) => (
+          {columns.map((column, index) => (
             <div key={column.id} className="flex items-center gap-3">
               <input
                 type="text"
                 value={column.name}
                 onChange={(event) => {
                   setColumns((currentColumns) =>
-                    currentColumns.map((item) =>
-                      item.id === column.id
+                    currentColumns.map((item, itemIndex) =>
+                      itemIndex === index
                         ? { ...item, name: event.target.value }
                         : item,
                     ),
                   );
                   setColumnsError("");
                 }}
-                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
+                className="h-10 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none transition-colors focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/30 dark:bg-[#2b2c37] dark:text-white"
               />
 
               <button
@@ -151,20 +156,22 @@ export default function EditBoardModal({
                 aria-label={`Remove ${column.name || "column"}`}
                 onClick={() => {
                   setColumns((currentColumns) =>
-                    currentColumns.filter((item) => item.id !== column.id),
+                    currentColumns.filter(
+                      (_, itemIndex) => itemIndex !== index,
+                    ),
                   );
                   setColumnsError("");
                 }}
-                className="flex h-10 w-6 shrink-0 items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555]"
+                className="flex h-10 w-8 shrink-0 items-center justify-center rounded text-[#828fa3] transition-colors hover:text-[#ea5555] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
               >
-                <Image src={crossIcon} width={15} height={15} alt="" />
+                <FiX size={24} aria-hidden="true" />
               </button>
             </div>
           ))}
         </div>
 
         {columnsError && (
-          <p className="mt-3 text-xs font-bold leading-5 text-[#ea5555]">
+          <p className="mt-2 text-xs font-bold text-[#ea5555]">
             {columnsError}
           </p>
         )}
