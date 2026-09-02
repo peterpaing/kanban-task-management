@@ -139,15 +139,42 @@ export default function AppShell({ children }: AppShellProps) {
     columns: string[];
   }) {
     setBoards((currentBoards) =>
-      currentBoards.map((board) =>
-        board.href === pathname
-          ? {
-              ...board,
-              name: updatedBoard.name,
-              columns: updatedBoard.columns,
-            }
-          : board,
-      ),
+      currentBoards.map((board) => {
+        if (board.href !== pathname) return board;
+
+        const fallbackColumn = updatedBoard.columns[0];
+
+        const updatedTasks = (board.tasks ?? []).map((task) => {
+          const oldColumnIndex = board.columns.indexOf(task.status);
+
+          if (oldColumnIndex === -1) return task;
+
+          const renamedColumn = updatedBoard.columns[oldColumnIndex];
+
+          if (renamedColumn) {
+            return {
+              ...task,
+              status: renamedColumn,
+            };
+          }
+
+          if (fallbackColumn) {
+            return {
+              ...task,
+              status: fallbackColumn,
+            };
+          }
+
+          return task;
+        });
+
+        return {
+          ...board,
+          name: updatedBoard.name,
+          columns: updatedBoard.columns,
+          tasks: updatedTasks,
+        };
+      }),
     );
   }
 
@@ -242,6 +269,7 @@ export default function AppShell({ children }: AppShellProps) {
 
       <EditBoardModal
         board={currentBoard}
+        taskCount={currentBoard?.tasks?.length ?? 0}
         isOpen={isEditBoardOpen}
         onClose={() => setIsEditBoardOpen(false)}
         onSave={handleSaveBoard}

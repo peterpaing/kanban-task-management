@@ -18,6 +18,7 @@ type UpdatedBoard = {
 
 type EditBoardModalProps = {
   board?: BoardData | null;
+  taskCount: number;
   isOpen: boolean;
   onClose: () => void;
   onSave: (updatedBoard: UpdatedBoard) => void;
@@ -25,6 +26,7 @@ type EditBoardModalProps = {
 
 export default function EditBoardModal({
   board,
+  taskCount,
   isOpen,
   onClose,
   onSave,
@@ -32,17 +34,19 @@ export default function EditBoardModal({
   const [boardName, setBoardName] = useState("");
   const [columns, setColumns] = useState<string[]>([]);
   const [nameError, setNameError] = useState("");
+  const [columnsError, setColumnsError] = useState("");
 
   useEffect(() => {
     if (!isOpen) return;
 
     setBoardName(board?.name ?? "Platform Launch");
     setColumns(
-    board && board.columns.length > 0
-      ? board.columns
-      : ["Todo", "Doing"],
-  );
+      board && board.columns.length > 0
+        ? board.columns
+        : ["Todo", "Doing"],
+    );
     setNameError("");
+    setColumnsError("");
   }, [board, isOpen]);
 
   if (!isOpen) return null;
@@ -57,6 +61,13 @@ export default function EditBoardModal({
 
     if (!name) {
       setNameError("Board name cannot be empty.");
+      return;
+    }
+
+    if (cleanedColumns.length === 0 && taskCount > 0) {
+      setColumnsError(
+        "This board has tasks. Delete or move its tasks before removing the final column.",
+      );
       return;
     }
 
@@ -110,26 +121,28 @@ export default function EditBoardModal({
               <input
                 type="text"
                 value={column}
-                onChange={(event) =>
+                onChange={(event) => {
                   setColumns((currentColumns) =>
                     currentColumns.map((item, itemIndex) =>
                       itemIndex === index ? event.target.value : item,
                     ),
-                  )
-                }
+                  );
+                  setColumnsError("");
+                }}
                 className="h-10 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
               />
 
               <button
                 type="button"
                 aria-label={`Remove ${column || "column"}`}
-                onClick={() =>
+                onClick={() => {
                   setColumns((currentColumns) =>
                     currentColumns.filter(
                       (_, itemIndex) => itemIndex !== index,
                     ),
-                  )
-                }
+                  );
+                  setColumnsError("");
+                }}
                 className="flex h-10 w-6 items-center justify-center"
               >
                 <Image src={crossIcon} width={15} height={15} alt="" />
@@ -138,11 +151,18 @@ export default function EditBoardModal({
           ))}
         </div>
 
+        {columnsError && (
+          <p className="mt-3 text-xs font-bold leading-5 text-[#ea5555]">
+            {columnsError}
+          </p>
+        )}
+
         <button
           type="button"
-          onClick={() =>
-            setColumns((currentColumns) => [...currentColumns, ""])
-          }
+          onClick={() => {
+            setColumns((currentColumns) => [...currentColumns, ""]);
+            setColumnsError("");
+          }}
           className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20"
         >
           <FiPlus size={16} aria-hidden="true" />
