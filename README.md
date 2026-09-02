@@ -5,6 +5,7 @@ A responsive Kanban task-management app built with Next.js, TypeScript, and Tail
 Create boards, organize tasks into columns, manage subtasks, and switch between light and dark mode. Board data is stored locally in the browser.
 
 ## Preview
+![Kanban app preview](./public/preview.png)
 
 
 ## Features
