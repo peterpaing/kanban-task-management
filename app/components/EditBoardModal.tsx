@@ -5,6 +5,7 @@ import { useEffect, useState, type SyntheticEvent } from "react";
 import { FiPlus } from "react-icons/fi";
 
 import crossIcon from "@/app/assets/icon-cross.svg";
+import useModalAccessibility from "@/app/hooks/useModalAccessibility";
 
 type BoardData = {
   name: string;
@@ -35,6 +36,8 @@ export default function EditBoardModal({
   const [columns, setColumns] = useState<string[]>([]);
   const [nameError, setNameError] = useState("");
   const [columnsError, setColumnsError] = useState("");
+
+  const modalRef = useModalAccessibility<HTMLFormElement>(isOpen, onClose);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -85,11 +88,19 @@ export default function EditBoardModal({
       onClick={onClose}
     >
       <form
+        ref={modalRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-board-title"
         onSubmit={handleSubmit}
         onClick={(event) => event.stopPropagation()}
-        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
+        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
       >
-        <h2 className="text-lg font-bold text-[#000112] dark:text-white">
+        <h2
+          id="edit-board-title"
+          className="text-lg font-bold text-[#000112] dark:text-white"
+        >
           Edit Board
         </h2>
 
@@ -103,7 +114,7 @@ export default function EditBoardModal({
               setBoardName(event.target.value);
               setNameError("");
             }}
-            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
           />
         </label>
 
@@ -129,7 +140,7 @@ export default function EditBoardModal({
                   );
                   setColumnsError("");
                 }}
-                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
               />
 
               <button
@@ -143,7 +154,7 @@ export default function EditBoardModal({
                   );
                   setColumnsError("");
                 }}
-                className="flex h-10 w-6 shrink-0 items-center justify-center"
+                className="flex h-10 w-6 shrink-0 items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555]"
               >
                 <Image src={crossIcon} width={15} height={15} alt="" />
               </button>
@@ -163,7 +174,7 @@ export default function EditBoardModal({
             setColumns((currentColumns) => [...currentColumns, ""]);
             setColumnsError("");
           }}
-          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20"
+          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
         >
           <FiPlus size={16} aria-hidden="true" />
           Add New Column
@@ -171,7 +182,7 @@ export default function EditBoardModal({
 
         <button
           type="submit"
-          className="mt-6 h-10 w-full rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
+          className="mt-6 h-10 w-full rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
         >
           Save Changes
         </button>

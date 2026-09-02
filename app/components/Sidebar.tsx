@@ -11,14 +11,15 @@ import {
 } from "react";
 import { FiPlus } from "react-icons/fi";
 
-import lightLogo from "@/app/assets/logo-light.svg";
-import darkLogo from "@/app/assets/logo-dark.svg";
-import lightThemeIcon from "@/app/assets/icon-light-theme.svg";
-import darkThemeIcon from "@/app/assets/icon-dark-theme.svg";
 import boardIcon from "@/app/assets/icon-board.svg";
-import hideSidebar from "@/app/assets/icon-hide-sidebar.svg";
-import showSidebar from "@/app/assets/icon-show-sidebar.svg";
 import crossIcon from "@/app/assets/icon-cross.svg";
+import darkLogo from "@/app/assets/logo-dark.svg";
+import darkThemeIcon from "@/app/assets/icon-dark-theme.svg";
+import hideSidebar from "@/app/assets/icon-hide-sidebar.svg";
+import lightLogo from "@/app/assets/logo-light.svg";
+import lightThemeIcon from "@/app/assets/icon-light-theme.svg";
+import showSidebar from "@/app/assets/icon-show-sidebar.svg";
+import useModalAccessibility from "@/app/hooks/useModalAccessibility";
 
 type Board = {
   name: string;
@@ -60,6 +61,11 @@ export default function Sidebar({
     setColumns([...DEFAULT_COLUMNS]);
     setBoardNameError("");
   }
+
+  const modalRef = useModalAccessibility<HTMLFormElement>(
+    isCreateBoardOpen,
+    closeCreateBoardModal,
+  );
 
   function createUniqueSlug(name: string) {
     const baseSlug =
@@ -145,7 +151,7 @@ export default function Sidebar({
                   <Link
                     href={board.href}
                     aria-current={isSelected ? "page" : undefined}
-                    className={`flex h-12 w-full items-center gap-3 rounded-r-full px-8 text-sm font-bold transition-colors ${
+                    className={`flex h-12 w-full items-center gap-3 rounded-r-full px-8 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#635fc7] ${
                       isSelected
                         ? "bg-[#635fc7] text-white"
                         : "text-[#828fa3] hover:bg-[#f4f7fd] hover:text-[#635fc7] dark:hover:bg-white"
@@ -162,7 +168,7 @@ export default function Sidebar({
           <button
             type="button"
             onClick={() => setIsCreateBoardOpen(true)}
-            className="mt-1 flex h-12 w-[calc(100%-24px)] items-center gap-3 rounded-r-full px-8 text-sm font-bold text-[#635fc7]"
+            className="mt-1 flex h-12 w-[calc(100%-24px)] items-center gap-3 rounded-r-full px-8 text-sm font-bold text-[#635fc7] transition-colors hover:bg-[#f4f7fd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#635fc7] dark:hover:bg-white"
           >
             <FiPlus size={18} className="shrink-0" aria-hidden="true" />
             <span className="leading-none">Create New Board</span>
@@ -179,7 +185,7 @@ export default function Sidebar({
               aria-checked={isDark}
               aria-label="Toggle dark mode"
               onClick={() => setIsDark((currentTheme) => !currentTheme)}
-              className="flex h-5 w-10 items-center rounded-full bg-[#635fc7] p-0.5 transition-colors hover:bg-[#a8a4ff]"
+              className="flex h-5 w-10 items-center rounded-full bg-[#635fc7] p-0.5 transition-colors hover:bg-[#a8a4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#20212c]"
             >
               <span
                 className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
@@ -194,7 +200,7 @@ export default function Sidebar({
           <button
             type="button"
             onClick={() => setIsSidebarHidden(true)}
-            className="mt-4 flex h-12 w-full items-center gap-3 rounded-md px-5 text-sm font-bold text-[#828fa3] transition-colors hover:bg-[#f4f7fd] dark:hover:bg-[#3e3f4e]"
+            className="mt-4 flex h-12 w-full items-center gap-3 rounded-md px-5 text-sm font-bold text-[#828fa3] transition-colors hover:bg-[#f4f7fd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] dark:hover:bg-[#3e3f4e]"
           >
             <Image src={hideSidebar} width={18} height={16} alt="" />
             Hide Sidebar
@@ -207,7 +213,7 @@ export default function Sidebar({
           type="button"
           onClick={() => setIsSidebarHidden(false)}
           aria-label="Show sidebar"
-          className="fixed bottom-8 left-0 z-30 hidden h-12 w-14 items-center justify-center rounded-r-full bg-[#635fc7] transition-colors hover:bg-[#a8a4ff] md:flex"
+          className="fixed bottom-8 left-0 z-30 hidden h-12 w-14 items-center justify-center rounded-r-full bg-[#635fc7] transition-colors hover:bg-[#a8a4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#20212c] md:flex"
         >
           <Image src={showSidebar} width={16} height={11} alt="" />
         </button>
@@ -219,11 +225,19 @@ export default function Sidebar({
           onClick={closeCreateBoardModal}
         >
           <form
+            ref={modalRef}
+            tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-board-title"
             onSubmit={handleCreateBoard}
             onClick={(event) => event.stopPropagation()}
-            className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
+            className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
           >
-            <h2 className="text-lg font-bold text-[#000112] dark:text-white">
+            <h2
+              id="create-board-title"
+              className="text-lg font-bold text-[#000112] dark:text-white"
+            >
               Add New Board
             </h2>
 
@@ -239,7 +253,7 @@ export default function Sidebar({
                 }}
                 placeholder="e.g. Web Design"
                 aria-invalid={Boolean(boardNameError)}
-                className={`mt-2 h-10 w-full rounded border bg-white px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white ${
+                className={`mt-2 h-10 w-full rounded border bg-white px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white ${
                   boardNameError
                     ? "border-[#ea5555]"
                     : "border-[#828fa3]/25"
@@ -268,7 +282,7 @@ export default function Sidebar({
                         ),
                       )
                     }
-                    className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                    className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
                   />
 
                   <button
@@ -281,7 +295,7 @@ export default function Sidebar({
                         ),
                       )
                     }
-                    className="flex h-10 w-6 shrink-0 items-center justify-center"
+                    className="flex h-10 w-6 shrink-0 items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555]"
                   >
                     <Image src={crossIcon} width={12} height={12} alt="" />
                   </button>
@@ -294,7 +308,7 @@ export default function Sidebar({
               onClick={() =>
                 setColumns((currentColumns) => [...currentColumns, ""])
               }
-              className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20"
+              className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
             >
               <FiPlus size={16} aria-hidden="true" />
               <span>Add New Column</span>
@@ -304,14 +318,14 @@ export default function Sidebar({
               <button
                 type="button"
                 onClick={closeCreateBoardModal}
-                className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 sm:max-w-none sm:flex-1"
+                className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
               >
                 Cancel
               </button>
 
               <button
                 type="submit"
-                className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff] sm:max-w-none sm:flex-1"
+                className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
               >
                 Create New Board
               </button>

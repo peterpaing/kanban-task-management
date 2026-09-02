@@ -5,6 +5,7 @@ import { useEffect, useState, type SyntheticEvent } from "react";
 import { FiPlus } from "react-icons/fi";
 
 import crossIcon from "@/app/assets/icon-cross.svg";
+import useModalAccessibility from "@/app/hooks/useModalAccessibility";
 
 type Subtask = {
   id: string;
@@ -40,6 +41,7 @@ export default function AddTaskModal({
   const [subtasks, setSubtasks] = useState<string[]>(DEFAULT_SUBTASKS);
   const [status, setStatus] = useState("");
   const [titleError, setTitleError] = useState("");
+  const modalRef = useModalAccessibility<HTMLFormElement>(isOpen, onClose);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -87,11 +89,19 @@ export default function AddTaskModal({
       onClick={onClose}
     >
       <form
+        ref={modalRef}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-task-title"
         onSubmit={handleSubmit}
         onClick={(event) => event.stopPropagation()}
-        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
+        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
       >
-        <h2 className="text-lg font-bold text-[#000112] dark:text-white">
+        <h2
+          id="add-task-title"
+          className="text-lg font-bold text-[#000112] dark:text-white"
+        >
           Add New Task
         </h2>
 
@@ -107,7 +117,7 @@ export default function AddTaskModal({
             }}
             placeholder="e.g. Take coffee break"
             aria-invalid={Boolean(titleError)}
-            className={`mt-2 h-10 w-full rounded border bg-white px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white ${
+            className={`mt-2 h-10 w-full rounded border bg-white px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white ${
               titleError ? "border-[#ea5555]" : "border-[#828fa3]/25"
             }`}
           />
@@ -126,7 +136,7 @@ export default function AddTaskModal({
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder="e.g. It’s always good to take a break. This 15 minute break will recharge the batteries a little."
-            className="mt-2 min-h-24 w-full resize-none rounded border border-[#828fa3]/25 bg-white px-4 py-3 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white sm:min-h-28"
+            className="mt-2 min-h-24 w-full resize-none rounded border border-[#828fa3]/25 bg-white px-4 py-3 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white sm:min-h-28"
           />
         </label>
 
@@ -150,7 +160,7 @@ export default function AddTaskModal({
                     ? "e.g. Make coffee"
                     : "e.g. Drink coffee & smile"
                 }
-                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                className="h-10 min-w-0 flex-1 rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
               />
 
               <button
@@ -163,7 +173,7 @@ export default function AddTaskModal({
                     ),
                   )
                 }
-                className="flex h-10 w-6 shrink-0 items-center justify-center"
+                className="flex h-10 w-6 shrink-0 items-center justify-center rounded text-[#828fa3] outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
               >
                 <Image src={crossIcon} width={15} height={15} alt="" />
               </button>
@@ -176,7 +186,7 @@ export default function AddTaskModal({
           onClick={() =>
             setSubtasks((currentSubtasks) => [...currentSubtasks, ""])
           }
-          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20"
+          className="mt-3 flex h-10 w-full items-center justify-center gap-2 rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
         >
           <FiPlus size={16} aria-hidden="true" />
           Add New Subtask
@@ -188,7 +198,7 @@ export default function AddTaskModal({
           <select
             value={status}
             onChange={(event) => setStatus(event.target.value)}
-            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+            className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
           >
             {columns.map((column) => (
               <option key={column} value={column}>
@@ -200,7 +210,7 @@ export default function AddTaskModal({
 
         <button
           type="submit"
-          className="mt-6 h-10 w-full rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
+          className="mt-6 h-10 w-full rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
         >
           Create Task
         </button>

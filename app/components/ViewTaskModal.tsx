@@ -5,6 +5,7 @@ import { FiEdit3, FiMoreVertical, FiTrash2, FiX } from "react-icons/fi";
 
 import DeleteTaskModal from "@/app/components/DeleteTaskModal";
 import EditTaskModal from "@/app/components/EditTaskModal";
+import useModalAccessibility from "@/app/hooks/useModalAccessibility";
 
 type Subtask = {
   id: string;
@@ -46,6 +47,11 @@ export default function ViewTaskModal({
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const taskMenuRef = useRef<HTMLDivElement>(null);
 
+  const modalRef = useModalAccessibility<HTMLElement>(
+    isOpen && !isDeleteModalOpen && !isEditModalOpen,
+    onClose,
+  );
+
   useEffect(() => {
     if (!isTaskMenuOpen) return;
 
@@ -84,12 +90,12 @@ export default function ViewTaskModal({
   }
 
   function handleDeleteTask() {
-    if (!task) return;
+  if (!task) return;
 
-    onDeleteTask(task.id);
-    setIsDeleteModalOpen(false);
-    onClose();
-  }
+  onDeleteTask(task.id);
+  setIsDeleteModalOpen(false);
+  onClose();
+}
 
   function handleSaveTask(updatedTask: Task) {
     onUpdateTask(updatedTask);
@@ -104,11 +110,13 @@ export default function ViewTaskModal({
         onClick={onClose}
       >
         <section
+          ref={modalRef}
+          tabIndex={-1}
           role="dialog"
           aria-modal="true"
           aria-labelledby="view-task-title"
           onClick={(event) => event.stopPropagation()}
-          className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
+          className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overscroll-contain overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
         >
           <div className="flex items-start justify-between gap-3">
             <h2
@@ -125,7 +133,7 @@ export default function ViewTaskModal({
                   aria-label="Open task menu"
                   aria-expanded={isTaskMenuOpen}
                   onClick={() => setIsTaskMenuOpen((isOpen) => !isOpen)}
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all duration-150 ease-out hover:scale-110 hover:bg-[#635fc7]/10 active:scale-95 ${
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all duration-150 ease-out hover:scale-110 hover:bg-[#635fc7]/10 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] ${
                     isTaskMenuOpen ? "scale-110 bg-[#635fc7]/10" : ""
                   }`}
                 >
@@ -142,8 +150,9 @@ export default function ViewTaskModal({
                 >
                   <button
                     type="button"
+                    tabIndex={isTaskMenuOpen ? 0 : -1}
                     onClick={handleOpenEditModal}
-                    className="flex w-full items-center gap-2 text-left text-sm font-medium text-[#828fa3] transition-colors hover:text-[#635fc7]"
+                    className="flex w-full items-center gap-2 text-left text-sm font-medium text-[#828fa3] transition-colors hover:text-[#635fc7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7]"
                   >
                     <FiEdit3 size={15} aria-hidden="true" />
                     Edit Task
@@ -151,8 +160,9 @@ export default function ViewTaskModal({
 
                   <button
                     type="button"
+                    tabIndex={isTaskMenuOpen ? 0 : -1}
                     onClick={handleOpenDeleteModal}
-                    className="mt-4 flex w-full items-center gap-2 text-left text-sm font-medium text-[#ea5555] transition-colors hover:text-[#ff9898]"
+                    className="mt-4 flex w-full items-center gap-2 text-left text-sm font-medium text-[#ea5555] transition-colors hover:text-[#ff9898] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555]"
                   >
                     <FiTrash2 size={15} aria-hidden="true" />
                     Delete Task
@@ -164,7 +174,7 @@ export default function ViewTaskModal({
                 type="button"
                 onClick={onClose}
                 aria-label="Close task"
-                className="flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 hover:text-[#635fc7] active:scale-95"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-[#828fa3] transition-all hover:scale-110 hover:bg-[#635fc7]/10 hover:text-[#635fc7] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
               >
                 <FiX size={20} aria-hidden="true" />
               </button>
@@ -189,7 +199,7 @@ export default function ViewTaskModal({
                   type="checkbox"
                   checked={subtask.isCompleted}
                   onChange={() => onToggleSubtask(task.id, subtask.id)}
-                  className="h-4 w-4 shrink-0 accent-[#635fc7]"
+                  className="h-4 w-4 shrink-0 accent-[#635fc7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2"
                 />
 
                 <span
@@ -213,7 +223,7 @@ export default function ViewTaskModal({
               onChange={(event) =>
                 onChangeStatus(task.id, event.target.value)
               }
-              className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+              className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 bg-white px-4 text-sm font-medium text-[#000112] outline-none focus:border-[#635fc7] focus-visible:ring-2 focus-visible:ring-[#635fc7]/40 dark:bg-[#2b2c37] dark:text-white"
             >
               {columns.map((column) => (
                 <option key={column} value={column}>
@@ -226,7 +236,7 @@ export default function ViewTaskModal({
           <button
             type="button"
             onClick={onClose}
-            className="mt-6 h-10 w-full rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff]"
+            className="mt-6 h-10 w-full rounded-full bg-[#635fc7] text-xs font-bold text-white transition-colors hover:bg-[#a8a4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
           >
             Done
           </button>

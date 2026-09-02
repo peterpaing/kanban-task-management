@@ -21,24 +21,22 @@ export default function BoardMenu({
       }`}
     >
       <button
-        type="button"
-        role="menuitem"
-        tabIndex={isOpen ? 0 : -1}
-        onClick={onEditBoard}
-        className="block w-full text-left text-sm font-medium text-[#828fa3] transition-colors hover:text-[#635fc7]"
-      >
-        Edit Board
-      </button>
+      type="button"
+      role="menuitem"
+      onClick={onEditBoard}
+      className="block w-full rounded px-1 text-left text-sm font-medium text-[#828fa3] hover:text-[#635fc7] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
+    >
+      Edit Board
+    </button>
 
-      <button
-        type="button"
-        role="menuitem"
-        tabIndex={isOpen ? 0 : -1}
-        onClick={onDeleteBoard}
-        className="mt-4 block w-full text-left text-sm font-medium text-[#ea5555] transition-colors hover:text-[#ff9898]"
-      >
-        Delete Board
-      </button>
+    <button
+      type="button"
+      role="menuitem"
+      onClick={onDeleteBoard}
+      className="mt-4 block w-full rounded px-1 text-left text-sm font-medium text-[#ea5555] hover:text-[#ff9898] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37]"
+    >
+      Delete Board
+    </button>
     </div>
   );
 }

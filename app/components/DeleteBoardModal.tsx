@@ -2,6 +2,8 @@
 
 import { FiAlertTriangle } from "react-icons/fi";
 
+import useModalAccessibility from "@/app/hooks/useModalAccessibility";
+
 type DeleteBoardModalProps = {
   isOpen: boolean;
   boardName: string;
@@ -17,6 +19,8 @@ export default function DeleteBoardModal({
   onClose,
   onDelete,
 }: DeleteBoardModalProps) {
+  const modalRef = useModalAccessibility<HTMLElement>(isOpen, onClose);
+
   if (!isOpen) return null;
 
   if (!canDelete) {
@@ -26,11 +30,13 @@ export default function DeleteBoardModal({
         onClick={onClose}
       >
         <section
+          ref={modalRef}
+          tabIndex={-1}
           role="dialog"
           aria-modal="true"
           aria-labelledby="keep-board-title"
           onClick={(event) => event.stopPropagation()}
-          className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
+          className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
         >
           <h2
             id="keep-board-title"
@@ -51,7 +57,7 @@ export default function DeleteBoardModal({
           <button
             type="button"
             onClick={onClose}
-            className="mt-6 h-10 w-full max-w-[280px] rounded-full bg-[#ea5555] text-xs font-bold text-white transition-colors hover:bg-[#ff9898] sm:max-w-none"
+            className="mt-6 h-10 w-full max-w-[280px] rounded-full bg-[#ea5555] text-xs font-bold text-white transition-colors hover:bg-[#ff9898] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none"
           >
             Close
           </button>
@@ -66,11 +72,13 @@ export default function DeleteBoardModal({
       onClick={onClose}
     >
       <section
+        ref={modalRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-board-title"
         onClick={(event) => event.stopPropagation()}
-        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
+        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[480px] overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:p-6 md:p-8"
       >
         <h2
           id="delete-board-title"
@@ -88,7 +96,7 @@ export default function DeleteBoardModal({
           <button
             type="button"
             onClick={onDelete}
-            className="h-10 w-full max-w-[280px] rounded-full bg-[#ea5555] text-xs font-bold text-white transition-colors hover:bg-[#ff9898] sm:max-w-none sm:flex-1"
+            className="h-10 w-full max-w-[280px] rounded-full bg-[#ea5555] text-xs font-bold text-white transition-colors hover:bg-[#ff9898] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
           >
             Delete
           </button>
@@ -96,7 +104,7 @@ export default function DeleteBoardModal({
           <button
             type="button"
             onClick={onClose}
-            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 sm:max-w-none sm:flex-1"
+            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
           >
             Cancel
           </button>

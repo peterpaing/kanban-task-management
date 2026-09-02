@@ -3,11 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-
-import lightThemeIcon from "@/app/assets/icon-light-theme.svg";
-import darkThemeIcon from "@/app/assets/icon-dark-theme.svg";
-import boardIcon from "@/app/assets/icon-board.svg";
 import { FiPlus } from "react-icons/fi";
+
+import boardIcon from "@/app/assets/icon-board.svg";
+import darkThemeIcon from "@/app/assets/icon-dark-theme.svg";
+import lightThemeIcon from "@/app/assets/icon-light-theme.svg";
+import useModalAccessibility from "@/app/hooks/useModalAccessibility";
 
 type Board = {
   name: string;
@@ -33,6 +34,7 @@ export default function MobileBoardMenu({
   onToggleTheme,
 }: MobileBoardMenuProps) {
   const pathname = usePathname();
+  const modalRef = useModalAccessibility<HTMLElement>(isOpen, onClose);
 
   if (!isOpen) return null;
 
@@ -42,11 +44,13 @@ export default function MobileBoardMenu({
       onClick={onClose}
     >
       <section
+        ref={modalRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-label="Board navigation"
         onClick={(event) => event.stopPropagation()}
-        className="mx-4 overflow-hidden rounded-lg bg-white py-5 dark:bg-[#2b2c37]"
+        className="mx-4 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-lg bg-white py-5 outline-none dark:bg-[#2b2c37]"
       >
         <p className="px-6 text-xs font-bold tracking-[0.15em] text-[#828fa3]">
           ALL BOARDS ({boards.length})
@@ -62,7 +66,7 @@ export default function MobileBoardMenu({
                   href={board.href}
                   onClick={onClose}
                   aria-current={isSelected ? "page" : undefined}
-                  className={`flex h-12 w-full items-center gap-4 rounded-r-full px-6 text-lg font-bold transition-colors ${
+                  className={`flex h-12 w-full items-center gap-4 rounded-r-full px-6 text-lg font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#635fc7] ${
                     isSelected
                       ? "bg-[#635fc7] text-white"
                       : "text-[#828fa3] hover:bg-[#f4f7fd] hover:text-[#635fc7] dark:hover:bg-white"
@@ -82,10 +86,10 @@ export default function MobileBoardMenu({
             onCreateBoard();
             onClose();
           }}
-          className="mt-1 flex h-12 w-[calc(100%-16px)] items-center gap-4 rounded-r-full px-6 text-lg font-bold text-[#635fc7] transition-colors hover:bg-[#f4f7fd] dark:hover:bg-white"
+          className="mt-1 flex h-12 w-[calc(100%-16px)] items-center gap-4 rounded-r-full px-6 text-lg font-bold text-[#635fc7] transition-colors hover:bg-[#f4f7fd] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#635fc7] dark:hover:bg-white"
         >
-        <FiPlus size={18} className="shrink-0" aria-hidden="true" />
-        <span className="leading-none">Create New Board</span>
+          <FiPlus size={18} className="shrink-0" aria-hidden="true" />
+          <span className="leading-none">Create New Board</span>
         </button>
 
         <div className="mx-4 mt-8 flex h-12 items-center justify-center gap-6 rounded-md bg-[#f4f7fd] dark:bg-[#20212c]">
@@ -97,7 +101,7 @@ export default function MobileBoardMenu({
             aria-checked={isDark}
             aria-label="Toggle dark mode"
             onClick={onToggleTheme}
-            className="flex h-5 w-10 items-center rounded-full bg-[#635fc7] p-0.5 transition-colors hover:bg-[#a8a4ff]"
+            className="flex h-5 w-10 items-center rounded-full bg-[#635fc7] p-0.5 transition-colors hover:bg-[#a8a4ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#20212c]"
           >
             <span
               className={`h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${

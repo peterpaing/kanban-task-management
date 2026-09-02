@@ -2,6 +2,8 @@
 
 import { FiAlertTriangle } from "react-icons/fi";
 
+import useModalAccessibility from "@/app/hooks/useModalAccessibility";
+
 type DeleteTaskModalProps = {
   isOpen: boolean;
   taskTitle: string;
@@ -15,6 +17,8 @@ export default function DeleteTaskModal({
   onClose,
   onDelete,
 }: DeleteTaskModalProps) {
+  const modalRef = useModalAccessibility<HTMLElement>(isOpen, onClose);
+
   if (!isOpen) return null;
 
   return (
@@ -23,11 +27,13 @@ export default function DeleteTaskModal({
       onClick={onClose}
     >
       <section
+        ref={modalRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
         aria-labelledby="delete-task-title"
         onClick={(event) => event.stopPropagation()}
-        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[340px] overflow-y-auto rounded-md bg-white p-5 dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:max-w-[400px] sm:p-7"
+        className="max-h-[calc(100dvh-1.5rem)] w-full max-w-[340px] overflow-y-auto rounded-md bg-white p-5 outline-none dark:bg-[#2b2c37] sm:max-h-[90dvh] sm:max-w-[400px] sm:p-7"
       >
         <div className="flex items-center gap-3">
           <FiAlertTriangle
@@ -53,7 +59,7 @@ export default function DeleteTaskModal({
           <button
             type="button"
             onClick={onDelete}
-            className="h-10 w-full max-w-[280px] rounded-full bg-[#ea5555] text-xs font-bold text-white transition-colors hover:bg-[#ff9898] sm:max-w-none sm:flex-1"
+            className="h-10 w-full max-w-[280px] rounded-full bg-[#ea5555] text-xs font-bold text-white transition-colors hover:bg-[#ff9898] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ea5555] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
           >
             Delete
           </button>
@@ -61,7 +67,7 @@ export default function DeleteTaskModal({
           <button
             type="button"
             onClick={onClose}
-            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 sm:max-w-none sm:flex-1"
+            className="h-10 w-full max-w-[280px] rounded-full bg-[#635fc7]/10 text-xs font-bold text-[#635fc7] transition-colors hover:bg-[#635fc7]/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#635fc7] focus-visible:ring-offset-2 dark:focus-visible:ring-offset-[#2b2c37] sm:max-w-none sm:flex-1"
           >
             Cancel
           </button>
