@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import BoardMenu from "@/app/components/BoardMenu";
 import mobileLogo from "@/app/assets/logo-mobile.svg";
@@ -30,6 +30,26 @@ export default function Header({
   onDeleteBoard,
 }: HeaderProps) {
   const [isBoardMenuOpen, setIsBoardMenuOpen] = useState(false);
+  const boardMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const clickedElement = event.target as Node;
+
+      if (
+        boardMenuRef.current &&
+        !boardMenuRef.current.contains(clickedElement)
+      ) {
+        setIsBoardMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   function handleEditBoard() {
     setIsBoardMenuOpen(false);
@@ -102,12 +122,17 @@ export default function Header({
           </span>
         </button>
 
-        <div className="relative">
+        <div ref={boardMenuRef} className="relative">
           <button
             type="button"
             aria-label="Open board menu"
+            aria-haspopup="menu"
             aria-expanded={isBoardMenuOpen}
+            aria-controls="board-menu"
             onClick={() => setIsBoardMenuOpen((isOpen) => !isOpen)}
+            className={`flex h-8 w-8 items-center justify-center rounded-full transition-all duration-150 ease-out hover:scale-110 hover:bg-[#635fc7]/10 active:scale-95 ${
+              isBoardMenuOpen ? "scale-110 bg-[#635fc7]/10" : ""
+            }`}
           >
             <Image src={ellipsis} width={5} height={16} alt="" />
           </button>

@@ -9,7 +9,6 @@ import {
   type SetStateAction,
   type SyntheticEvent,
 } from "react";
-
 import { FiPlus } from "react-icons/fi";
 
 import lightLogo from "@/app/assets/logo-light.svg";
@@ -38,6 +37,8 @@ type SidebarProps = {
   setIsSidebarHidden: (isHidden: boolean) => void;
 };
 
+const DEFAULT_COLUMNS = ["Todo", "Doing"];
+
 export default function Sidebar({
   boards,
   setBoards,
@@ -50,12 +51,12 @@ export default function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const [boardName, setBoardName] = useState("");
-  const [columns, setColumns] = useState<string[]>([]);
+  const [columns, setColumns] = useState<string[]>([...DEFAULT_COLUMNS]);
 
   function closeCreateBoardModal() {
     setIsCreateBoardOpen(false);
     setBoardName("");
-    setColumns([]);
+    setColumns([...DEFAULT_COLUMNS]);
   }
 
   function handleCreateBoard(event: SyntheticEvent<HTMLFormElement>) {
@@ -193,12 +194,13 @@ export default function Sidebar({
 
             <label className="mt-6 block text-xs font-bold text-[#828fa3]">
               Name
+
               <input
                 type="text"
                 value={boardName}
                 onChange={(event) => setBoardName(event.target.value)}
                 placeholder="e.g. Web Design"
-                className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 px-4 text-sm text-[#000112] outline-none focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
+                className="mt-2 h-10 w-full rounded border border-[#828fa3]/25 px-4 text-sm text-[#000112] outline-none placeholder:text-[#828fa3]/55 focus:border-[#635fc7] dark:bg-[#2b2c37] dark:text-white"
               />
             </label>
 
@@ -206,7 +208,7 @@ export default function Sidebar({
 
             <div className="mt-2 space-y-3">
               {columns.map((column, index) => (
-                <div key={`${column}-${index}`} className="flex items-center gap-3">
+                <div key={index} className="flex items-center gap-3">
                   <input
                     type="text"
                     value={column}
